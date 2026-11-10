@@ -11,6 +11,6 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.8
       - key: ALLOWED_ORIGINS
-        value: "*"
+        value: "https://kavach-ai-vx7p.vercel.app,http://localhost:3000"
       - key: GEMINI_API_KEY
         sync: false

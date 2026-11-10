@@ -29,7 +29,8 @@ app = FastAPI(
 )
 
 # CORS setup
-allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+# Strictly allow Vercel production domain and localhost
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "https://kavach-ai-vx7p.vercel.app,http://localhost:3000")
 allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
 
 app.add_middleware(
