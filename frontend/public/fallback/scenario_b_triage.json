@@ -1,0 +1,79 @@
+{
+  "incident_id": "INC-2026-0001",
+  "what_likely_happened": "An attacker compromised the user workstation WS-ENG-088 and performed a network port scan to map internal services. They then used lateral movement via SMB/Admin shares with the svc_deploy service account to access SRV-APP-03, subsequently reusing credentials across production servers before performing LSASS process memory access on SRV-DB-PROD for privilege escalation.",
+  "evidence": [
+    {
+      "event_id": "EVT-B-01",
+      "technique_id": "T1046",
+      "technique_name": "Network Service Discovery",
+      "finding": "Subnet Port Scan Detected on Internal Segment",
+      "detail": "Host WS-ENG-088 initiated SYN scan targeting 254 endpoints on 10.0.4.0/24 across ports 22, 135, 445, 3389, 8080"
+    },
+    {
+      "event_id": "EVT-B-02",
+      "technique_id": "T1021.002",
+      "technique_name": "Remote Services: SMB/Windows Admin Shares",
+      "finding": "PsExec Remote Service Execution via Admin Share",
+      "detail": "Service installation detected: PSEXESVC created on SRV-APP-03 from source WS-ENG-088 using credential svc_deploy"
+    },
+    {
+      "event_id": "EVT-B-03",
+      "technique_id": "T1078.002",
+      "technique_name": "Valid Accounts: Domain Accounts",
+      "finding": "Service Account Credential Reuse Across Production Tier",
+      "detail": "Account svc_deploy authenticated concurrently across SRV-APP-03, SRV-DB-PROD, and SRV-AUTH-01 within 2 minutes"
+    },
+    {
+      "event_id": "EVT-B-04",
+      "technique_id": "T1068",
+      "technique_name": "Exploitation for Privilege Escalation",
+      "finding": "Privilege Escalation via Memory Injection & LSASS Access",
+      "detail": "Process rundll32.exe opened handle with PROCESS_ALL_ACCESS to lsass.exe on SRV-DB-PROD to dump NTDS / memory secrets"
+    }
+  ],
+  "confidence_score": 95,
+  "confidence_reason": "All events contain fully populated hostnames, valid usernames, specific MITRE techniques, and follow a clear, coherent progression through the attacker kill chain without missing fields or adversarial tampering.",
+  "recommended_actions": [
+    {
+      "id": "ACT-B-01",
+      "action_type": "BLOCK_INTERNAL_RECON",
+      "target": "10.0.4.88",
+      "impact": "LOW",
+      "status": "executed",
+      "title": "Apply Microsegmentation ACL on Port Scanning Source",
+      "description": "Automatically isolated host 10.0.4.88 from internal subnets at core switch layer."
+    },
+    {
+      "id": "ACT-B-02",
+      "action_type": "REVOKE_SERVICE_TICKET",
+      "target": "svc_deploy",
+      "impact": "LOW",
+      "status": "executed",
+      "title": "Purge Kerberos TGT & Revoke Service Tickets",
+      "description": "Automatically purged Kerberos tickets for svc_deploy across Domain Controllers."
+    },
+    {
+      "id": "ACT-B-03",
+      "action_type": "ISOLATE_HOST",
+      "target": "SRV-APP-03",
+      "impact": "HIGH",
+      "status": "pending",
+      "title": "Quarantine Compromised Application Server",
+      "description": "Sever network connectivity on SRV-APP-03 to halt remote PsExec payload execution."
+    },
+    {
+      "id": "ACT-B-04",
+      "action_type": "DATABASE_SNAPSHOT_LOCKDOWN",
+      "target": "SRV-DB-PROD",
+      "impact": "HIGH",
+      "status": "pending",
+      "title": "Freeze Production Database & Revoke System Privileges",
+      "description": "Initiate immutable storage snapshot and restrict access to DB tier to contain LSASS dump."
+    }
+  ],
+  "prompt_injection_flagged": false,
+  "prompt_injection_details": [],
+  "uncertain_flag": false,
+  "analyst_queue_reason": null,
+  "triage_mode": "deterministic_fallback (offline snapshot)"
+}

@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "service": "KAVACH-AI (Precomputed Offline Snapshot)",
+  "fallback_active": true,
+  "models_loaded": true,
+  "llm_provider": "Deterministic Fallback Engine",
+  "replay_mode": "Simulated data / replay mode active"
+}

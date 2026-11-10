@@ -1,0 +1,52 @@
+# Environment variables
+.env
+.env*.local
+*.env
+
+# Python
+backend/venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node & Next.js
+frontend/node_modules/
+node_modules/
+frontend/.next/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Datasets and raw dumps
+*.csv
+!backend/data/cic_ids2017_sample.csv
+*.pcap
+*.pcap_ISCX.csv
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

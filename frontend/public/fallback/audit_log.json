@@ -1,0 +1,24 @@
+{
+  "logs": [
+    {
+      "id": "AUD-00002",
+      "timestamp": "2026-11-10T04:47:30.128577+00:00",
+      "actor": "SYSTEM",
+      "category": "DEFENSE",
+      "action": "PROMPT_SHIELD_ARMED",
+      "target": "Triage Agent Pipeline",
+      "reason": "Adversarial prompt injection filters initialized with heuristic boundary enforcement.",
+      "metadata": {}
+    },
+    {
+      "id": "AUD-00001",
+      "timestamp": "2026-11-10T04:47:30.128554+00:00",
+      "actor": "SYSTEM",
+      "category": "STARTUP",
+      "action": "ENGINE_INITIALIZED",
+      "target": "KAVACH-AI Core",
+      "reason": "FastAPI backend and scikit-learn models (Isolation Forest + HistGradientBoosting) loaded successfully.",
+      "metadata": {}
+    }
+  ]
+}

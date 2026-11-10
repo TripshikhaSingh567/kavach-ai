@@ -1,0 +1,88 @@
+{
+  "incident_id": "INC-2026-0001",
+  "what_likely_happened": "An attacker compromised user sarah.jenkins via a targeted phishing link, subsequently performing an impossible travel login to hijack the cloud session. The adversary established an email forwarding rule to collect sensitive financial communications before mass-downloading restricted financial audit spreadsheets and payroll archives for exfiltration.",
+  "evidence": [
+    {
+      "event_id": "EVT-A-01",
+      "technique_id": "T1566.002",
+      "technique_name": "Phishing: Spearphishing Link",
+      "finding": "User accessed external phishing domain",
+      "detail": "User sarah.jenkins clicked link to login-microsoft-auth.secure-verify.net/reset from host WS-FIN-042."
+    },
+    {
+      "event_id": "EVT-A-02",
+      "technique_id": "T1078.004",
+      "technique_name": "Valid Accounts: Cloud Accounts",
+      "finding": "Anomalous geolocation authentication",
+      "detail": "Successful authentication from Bucharest, Romania 6 minutes after London login, indicating session compromise."
+    },
+    {
+      "event_id": "EVT-A-03",
+      "technique_id": "T1114.003",
+      "technique_name": "Email Collection: Email Forwarding Rule",
+      "finding": "Mailbox rule created for collection",
+      "detail": "Exchange Online inbox rule created to forward financial emails to drop-audit-q4@protonmail.com."
+    },
+    {
+      "event_id": "EVT-A-04",
+      "technique_id": "T1020",
+      "technique_name": "Automated Exfiltration",
+      "finding": "High-volume sensitive SMB share access",
+      "detail": "Downloaded 48 restricted financial audit spreadsheets and payroll archives from SRV-SHARE-01 within 45 seconds."
+    }
+  ],
+  "confidence_score": 54,
+  "confidence_reason": "Confidence score lowered below 60% due to the presence of fragmented and missing host/user telemetry in event EVT-ROBUST-MISSING_scenario_a.",
+  "recommended_actions": [
+    {
+      "id": "ACT-A-01",
+      "action_type": "BLOCK_EXTERNAL_IP",
+      "target": "185.220.101.5",
+      "impact": "LOW",
+      "status": "executed",
+      "title": "Block Malicious Ingress IP at Perimeter Firewall",
+      "description": "Automatically pushed firewall drop rule for 185.220.101.5 (Tor Exit / Geo anomaly)."
+    },
+    {
+      "id": "ACT-A-02",
+      "action_type": "FORCE_PASSWORD_RESET",
+      "target": "sarah.jenkins",
+      "impact": "LOW",
+      "status": "executed",
+      "title": "Revoke Active Sessions & Force Password Reset",
+      "description": "Automatically invalidated Entra ID refresh tokens and forced immediate credential change."
+    },
+    {
+      "id": "ACT-A-03",
+      "action_type": "REMOVE_MAILBOX_FORWARDING",
+      "target": "sarah.jenkins@corp.local",
+      "impact": "LOW",
+      "status": "executed",
+      "title": "Purge Illicit Exchange Forwarding Rule",
+      "description": "Automatically deleted mailbox redirect rule to drop-audit-q4@protonmail.com."
+    },
+    {
+      "id": "ACT-A-04",
+      "action_type": "ISOLATE_HOST",
+      "target": "AZURE-IDP-01",
+      "impact": "HIGH",
+      "status": "pending",
+      "title": "Network Isolation of Financial Workstation",
+      "description": "Quarantine WS-FIN-042 via EDR to prevent lateral movement. Sever all NIC traffic except EDR heartbeat."
+    },
+    {
+      "id": "ACT-A-05",
+      "action_type": "LOCKOUT_ACCOUNT",
+      "target": "sarah.jenkins",
+      "impact": "HIGH",
+      "status": "pending",
+      "title": "Immediate Enterprise Account Lockout",
+      "description": "Disable AD account and freeze all domain privilege tokens pending forensic interview."
+    }
+  ],
+  "prompt_injection_flagged": false,
+  "prompt_injection_details": [],
+  "uncertain_flag": true,
+  "analyst_queue_reason": "Fragmented telemetry: packet buffer overflow dropped host/user context. Analyst manual review required.",
+  "triage_mode": "deterministic_fallback (offline snapshot)"
+}

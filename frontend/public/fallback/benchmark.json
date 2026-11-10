@@ -1,0 +1,72 @@
+{
+  "disclaimer": "Simulated and synthetic dataset derived from CIC-IDS2017 baseline for reproducible hackathon demonstration.",
+  "scenarios_evaluated": [
+    "Scenario A (Phishing Credential Compromise)",
+    "Scenario B (Lateral Movement)"
+  ],
+  "baseline_summary": {
+    "system": "Rule-Only Baseline (Traditional SIEM)",
+    "total_alerts": 7,
+    "true_positives": 5,
+    "false_positives": 2,
+    "false_negatives": 9,
+    "detection_rate_pct": 35.7,
+    "false_positive_rate_pct": 16.7,
+    "mttd_seconds": 10,
+    "mttr_minutes": 52.5,
+    "analyst_effort_items": 7,
+    "note": "Alert fatigue caused by duplicate tickets and false positives on vulnerability scanner."
+  },
+  "kavach_summary": {
+    "system": "KAVACH-AI (Autonomous Resilience)",
+    "total_alerts": 26,
+    "true_positives": 12,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "detection_rate_pct": 100.0,
+    "false_positive_rate_pct": 0.0,
+    "mttd_seconds": 5,
+    "mttr_minutes": 2.4,
+    "analyst_effort_items": 4,
+    "incidents_count": 4,
+    "reduction_in_analyst_effort_pct": 60.0,
+    "note": "Correlates fragmented alerts into 1 unified incident; suppresses duplicate noise and handles scanner traffic gracefully."
+  },
+  "detailed_comparison": [
+    {
+      "metric": "Detection Rate (Recall)",
+      "unit": "%",
+      "baseline": "35.7%",
+      "kavach_ai": "100.0%",
+      "improvement": "+64.3%"
+    },
+    {
+      "metric": "False Positive Rate (FPR)",
+      "unit": "%",
+      "baseline": "16.7%",
+      "kavach_ai": "0.0%",
+      "improvement": "-16.7%"
+    },
+    {
+      "metric": "Mean Time to Detect (MTTD)",
+      "unit": "seconds",
+      "baseline": "10s",
+      "kavach_ai": "5s",
+      "improvement": "50.0% faster"
+    },
+    {
+      "metric": "Mean Time to Respond (MTTR)",
+      "unit": "minutes",
+      "baseline": "52.5m",
+      "kavach_ai": "2.4m",
+      "improvement": "95.4% reduction"
+    },
+    {
+      "metric": "Analyst Effort (Items to Review)",
+      "unit": "tickets / incidents",
+      "baseline": "7 disjoint tickets",
+      "kavach_ai": "4 correlated incident",
+      "improvement": "42.9% reduction"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "scenario_a",
+    "name": "Scenario A: Phishing-led Credential Compromise",
+    "description": "Spearphishing link, impossible travel authentication, mailbox forwarding rule, sensitive data exfiltration.",
+    "mitre_chain": [
+      "T1566.002",
+      "T1078.004",
+      "T1114.003",
+      "T1020"
+    ],
+    "difficulty": "CRITICAL"
+  },
+  {
+    "id": "scenario_b",
+    "name": "Scenario B: Lateral Movement & Privilege Escalation",
+    "description": "Internal subnet port scan, remote PsExec service execution, credential reuse, LSASS memory injection.",
+    "mitre_chain": [
+      "T1046",
+      "T1021.002",
+      "T1078.002",
+      "T1068"
+    ],
+    "difficulty": "CRITICAL"
+  }
+]
