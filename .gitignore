@@ -1,6 +1,6 @@
 # Environment variables
 .env
-.env*.local
+.env*
 *.env
 
 # Python
@@ -18,8 +18,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
+!frontend/src/**
+!frontend/src/lib/**
 parts/
 sdist/
 var/
