@@ -89,15 +89,23 @@ export default function Home() {
       setBenchmarkData(bench);
       setAuditLogs(logs);
 
+      setIsLoadingPipeline(false);
+
       if (correlated?.correlated_incidents?.length > 0) {
         setIsLoadingTriage(true);
-        const triage = await triageIncident(correlated.correlated_incidents[0], scenarioId);
-        setTriageData(triage);
-        setIsLoadingTriage(false);
+        triageIncident(correlated.correlated_incidents[0], scenarioId)
+          .then((triage) => {
+            setTriageData(triage);
+          })
+          .catch((err) => {
+            console.error("Triage error:", err);
+          })
+          .finally(() => {
+            setIsLoadingTriage(false);
+          });
       }
     } catch (err) {
       console.error("Initialization error:", err);
-    } finally {
       setIsLoadingPipeline(false);
     }
   }, [scenarioId]);
