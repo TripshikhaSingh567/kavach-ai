@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Shield, ShieldAlert, CheckCircle2, XCircle, Clock, Zap, ArrowRight, UserCheck, AlertOctagon } from "lucide-react";
+import { Check, X, ShieldAlert, CheckCircle2, Clock, CheckSquare } from "lucide-react";
 import { approveAction, rejectAction } from "@/lib/api";
 
 interface ApprovalsViewProps {
@@ -16,29 +16,39 @@ export const ApprovalsView: React.FC<ApprovalsViewProps> = ({
   onActionUpdated,
 }) => {
   const [actions, setActions] = useState<any[]>(() => {
-    return triageData?.recommended_actions || [];
+    return (triageData?.recommended_actions || []).map((a: any) => ({
+      ...a,
+      updatedAt: null,
+      updatedBy: null,
+    }));
   });
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const [analystFeedback, setAnalystFeedback] = useState<string>("");
 
-  const lowRiskActions = actions.filter((a) => a.impact === "LOW");
-  const highImpactActions = actions.filter((a) => a.impact === "HIGH");
+  const needsApproval = actions.filter((a) => a.impact === "HIGH");
+  const ranAutomatically = actions.filter((a) => a.impact === "LOW");
 
   const handleApprove = async (action: any) => {
     setProcessingId(action.id);
+    const nowTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
     try {
       await approveAction({
         action_id: action.id,
         action_title: action.title,
         target: action.target,
         incident_id: incidentId,
-        analyst_name: "trips (SOC Tier-2 Lead)",
-        reason: analystFeedback || "Authorized after confirming kill chain in attack graph.",
+        analyst_name: "Security Analyst",
+        reason: "Authorized after verifying incident kill chain.",
       });
 
       setActions((prev) =>
         prev.map((a) =>
-          a.id === action.id ? { ...a, status: "approved" } : a
+          a.id === action.id
+            ? { ...a, status: "approved", updatedAt: nowTime, updatedBy: "Analyst" }
+            : a
         )
       );
       if (onActionUpdated) onActionUpdated();
@@ -51,19 +61,26 @@ export const ApprovalsView: React.FC<ApprovalsViewProps> = ({
 
   const handleReject = async (action: any) => {
     setProcessingId(action.id);
+    const nowTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
     try {
       await rejectAction({
         action_id: action.id,
         action_title: action.title,
         target: action.target,
         incident_id: incidentId,
-        analyst_name: "trips (SOC Tier-2 Lead)",
-        reason: analystFeedback || "Action rejected by analyst to prevent business disruption.",
+        analyst_name: "Security Analyst",
+        reason: "Action rejected to maintain service continuity.",
       });
 
       setActions((prev) =>
         prev.map((a) =>
-          a.id === action.id ? { ...a, status: "rejected" } : a
+          a.id === action.id
+            ? { ...a, status: "rejected", updatedAt: nowTime, updatedBy: "Analyst" }
+            : a
         )
       );
       if (onActionUpdated) onActionUpdated();
@@ -76,52 +93,30 @@ export const ApprovalsView: React.FC<ApprovalsViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="p-5 rounded-xl border border-soc-border bg-soc-card shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                Human-in-the-Loop Safeguard
-              </span>
-              <span className="text-xs font-mono text-slate-400">Incident: {incidentId}</span>
-            </div>
-            <h1 className="text-lg font-black text-white mt-1">Autonomous Resilience &amp; Response Playbook</h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Low-risk perimeter actions execute autonomously without delay. High-impact operations (host isolation, account lockout) require explicit analyst authorization.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-2 text-xs font-mono">
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 text-center">
-              <div className="text-emerald-400 font-bold">{lowRiskActions.filter(a => a.status === "executed").length}</div>
-              <div className="text-[10px] text-slate-500 uppercase">Auto-Executed</div>
-            </div>
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 text-center">
-              <div className="text-amber-400 font-bold">{highImpactActions.filter(a => a.status === "pending").length}</div>
-              <div className="text-[10px] text-slate-500 uppercase">Pending Approval</div>
-            </div>
-          </div>
-        </div>
+      {/* Page Header */}
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Approvals</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Review high-impact containment actions requiring analyst authorization before execution.
+        </p>
       </div>
 
-      {/* Section 1: High-Impact Actions Requiring Approval */}
-      <div className="rounded-xl border border-rose-900/40 bg-soc-card shadow-xl overflow-hidden">
-        <div className="p-4 border-b border-rose-900/40 bg-rose-950/20 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <AlertOctagon className="w-5 h-5 text-rose-400" />
-            <div>
-              <h2 className="text-sm font-bold text-white">High-Impact Containment Actions (Approval Gate)</h2>
-              <p className="text-xs text-rose-300/70">Actions that may disrupt business operations or lock out core infrastructure</p>
-            </div>
+      {/* Section 1: Needs Approval */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Needs approval</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Actions with potential to disrupt host connectivity or production services.
+            </p>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">
-            HUMAN-IN-THE-LOOP REQUIRED
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+            {needsApproval.filter((a) => a.status === "pending").length} pending
           </span>
         </div>
 
-        <div className="divide-y divide-slate-800/80 p-4 space-y-4">
-          {highImpactActions.map((action) => {
+        <div className="divide-y divide-gray-100">
+          {needsApproval.map((action) => {
             const isPending = action.status === "pending";
             const isApproved = action.status === "approved";
             const isRejected = action.status === "rejected";
@@ -129,57 +124,56 @@ export const ApprovalsView: React.FC<ApprovalsViewProps> = ({
             return (
               <div
                 key={action.id}
-                className="p-4 rounded-lg bg-slate-950 border border-slate-800/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors"
               >
-                <div className="space-y-1.5 max-w-2xl">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs font-mono font-bold text-rose-400">{action.id}</span>
-                    <span className="font-bold text-sm text-white">{action.title}</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                      Target: {action.target}
+                <div className="space-y-1.5 max-w-xl">
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-xs font-mono font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">
+                      {action.id}
                     </span>
+                    <span className="text-sm font-bold text-gray-900">{action.title}</span>
                   </div>
-                  <p className="text-xs text-slate-300">{action.description}</p>
-                  <div className="text-[11px] font-mono text-slate-500">
-                    Impact: <strong className="text-rose-400">HIGH</strong> &bull; Sever network connection or freeze security tokens.
+                  <p className="text-xs text-gray-600 leading-relaxed">{action.description}</p>
+                  <div className="text-xs font-mono text-gray-500">
+                    Target: <strong className="font-semibold text-gray-900">{action.target}</strong>
                   </div>
                 </div>
 
-                {/* Status & Approval Buttons */}
-                <div className="flex items-center space-x-2 self-end md:self-center">
+                {/* Status / Actions */}
+                <div className="flex items-center space-x-2.5 self-start sm:self-center">
                   {isPending && (
-                    <div className="flex items-center space-x-2">
+                    <>
                       <button
                         disabled={processingId === action.id}
                         onClick={() => handleApprove(action)}
-                        className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-md shadow-emerald-500/20 disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
+                        <Check className="w-4 h-4" />
                         <span>Approve</span>
                       </button>
 
                       <button
                         disabled={processingId === action.id}
                         onClick={() => handleReject(action)}
-                        className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-rose-950 hover:text-rose-300 text-slate-300 font-semibold text-xs border border-slate-700 transition-colors disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-rose-50 hover:border-rose-300 text-rose-700 text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
                       >
-                        <XCircle className="w-4 h-4" />
+                        <X className="w-4 h-4" />
                         <span>Reject</span>
                       </button>
-                    </div>
+                    </>
                   )}
 
                   {isApproved && (
-                    <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-800 text-xs font-mono font-bold">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span>APPROVED &amp; EXECUTED</span>
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold shadow-xs">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Approved by analyst {action.updatedAt ? `(${action.updatedAt})` : ""}</span>
                     </div>
                   )}
 
                   {isRejected && (
-                    <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-950/60 text-rose-300 border border-rose-800 text-xs font-mono font-bold">
-                      <XCircle className="w-4 h-4 text-rose-400" />
-                      <span>REJECTED BY ANALYST</span>
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-semibold shadow-xs">
+                      <X className="w-4 h-4 text-rose-600" />
+                      <span>Rejected by analyst {action.updatedAt ? `(${action.updatedAt})` : ""}</span>
                     </div>
                   )}
                 </div>
@@ -189,41 +183,42 @@ export const ApprovalsView: React.FC<ApprovalsViewProps> = ({
         </div>
       </div>
 
-      {/* Section 2: Low-Risk Automated Actions */}
-      <div className="rounded-xl border border-soc-border bg-soc-card shadow-xl overflow-hidden">
-        <div className="p-4 border-b border-soc-border bg-slate-900/40 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Zap className="w-5 h-5 text-emerald-400" />
-            <div>
-              <h2 className="text-sm font-bold text-white">Low-Risk Autonomous Actions (Zero Latency)</h2>
-              <p className="text-xs text-slate-400">Non-destructive containment executed automatically to stop adversary velocity</p>
-            </div>
+      {/* Section 2: Ran Automatically */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Ran automatically</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Low-risk perimeter actions executed immediately to prevent further progression.
+            </p>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
-            AUTONOMOUS (0.5s)
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            {ranAutomatically.length} executed
           </span>
         </div>
 
-        <div className="divide-y divide-slate-800/80 p-4 space-y-3">
-          {lowRiskActions.map((action) => (
+        <div className="divide-y divide-gray-100">
+          {ranAutomatically.map((action) => (
             <div
               key={action.id}
-              className="p-3.5 rounded-lg bg-slate-950/60 border border-slate-800/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-3"
+              className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors"
             >
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs font-mono font-bold text-emerald-400">{action.id}</span>
-                  <span className="font-bold text-xs text-white">{action.title}</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
-                    Target: {action.target}
+              <div className="space-y-1.5">
+                <div className="flex items-center space-x-2.5">
+                  <span className="text-xs font-mono font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">
+                    {action.id}
                   </span>
+                  <span className="text-sm font-bold text-gray-900">{action.title}</span>
                 </div>
-                <p className="text-xs text-slate-400">{action.description}</p>
+                <p className="text-xs text-gray-600">{action.description}</p>
+                <div className="text-xs font-mono text-gray-500">
+                  Target: <strong className="font-semibold text-gray-900">{action.target}</strong>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-1.5 px-3 py-1 rounded bg-emerald-950/50 text-emerald-300 border border-emerald-800/60 text-[11px] font-mono font-bold whitespace-nowrap self-end md:self-center">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>EXECUTED AUTOMATICALLY</span>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold self-start sm:self-center whitespace-nowrap shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>Executed automatically</span>
               </div>
             </div>
           ))}

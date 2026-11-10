@@ -1,150 +1,114 @@
 "use client";
 
 import React from "react";
-import { Layers, Shield, Database, Cpu, Network, ArrowRight, Server, Terminal, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Layers, Cpu, Database, Network, ShieldCheck } from "lucide-react";
 
 export const ArchitectureView: React.FC = () => {
+  const layers = [
+    {
+      step: "1",
+      name: "Telemetry Ingestion",
+      tools: "Wazuh Agent & EDR",
+      description: "Captures process creation, authentication events, and network flow logs.",
+    },
+    {
+      step: "2",
+      name: "Storage & Indexing",
+      tools: "Elasticsearch & Kafka",
+      description: "Buffers high-volume telemetry and indexes structured security documents.",
+    },
+    {
+      step: "3",
+      name: "Threat Detection",
+      tools: "Isolation Forest & Sigma",
+      description: "Combines anomaly scoring, gradient-boosted patterns, and Sigma rules.",
+    },
+    {
+      step: "4",
+      name: "Correlation & Triage",
+      tools: "NetworkX & Gemini",
+      description: "Clusters alerts into incidents and generates narrative triage with evidence.",
+    },
+    {
+      step: "5",
+      name: "Orchestration & Response",
+      tools: "SOAR & Human Approval",
+      description: "Executes low-risk actions automatically; prompts analysts for high-impact isolation.",
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="p-5 rounded-xl border border-soc-border bg-soc-card shadow-xl">
-        <div className="flex items-center space-x-2">
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-            System Design &amp; Scalability
-          </span>
-          <span className="text-xs font-mono text-slate-400">Enterprise Blueprint</span>
-        </div>
-        <h1 className="text-lg font-black text-white mt-1">Enterprise Production Architecture</h1>
-        <p className="text-xs text-slate-400 mt-0.5">
-          Blueprint illustrating how KAVACH-AI integrates into enterprise security operations with Wazuh, Elasticsearch, SIEM, SOAR, and EDR.
+      {/* Page Header */}
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Architecture</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Production integration blueprint showing telemetry flow across enterprise security systems.
         </p>
       </div>
 
-      {/* Production Architecture Diagram Canvas */}
-      <div className="p-6 rounded-xl border border-soc-border bg-soc-card shadow-2xl space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center space-x-2">
-            <Layers className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-              End-to-End Cyber-Resilience Pipeline
-            </h2>
+      {/* 5-Layer Horizontal Flow */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <div>
+            <h3 className="text-base font-bold text-gray-900">End-to-end processing pipeline</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Telemetry journey from raw endpoint events to coordinated response.</p>
           </div>
-          <span className="text-[11px] font-mono text-cyan-400 px-2.5 py-1 rounded bg-cyan-950/60 border border-cyan-800">
-            Production Integration Specification (Diagram Only)
+          <span className="text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-3 py-1 rounded-full">
+            Production Blueprint
           </span>
         </div>
 
-        {/* Visual Pipeline Flow */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {/* Layer 1: Ingestion & EDR */}
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 flex flex-col justify-between">
-            <div>
-              <div className="text-[10px] font-mono uppercase text-cyan-400 font-bold mb-1">Layer 1: Telemetry</div>
-              <h3 className="text-xs font-bold text-white">Wazuh &amp; EDR Agents</h3>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Endpoints, firewalls, and cloud IDPs stream raw security events and NetFlow captures.
+        {/* Horizontal Boxes with Arrows */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3.5 items-stretch pt-2">
+          {layers.map((layer, idx) => (
+            <div
+              key={layer.step}
+              className="flex flex-col justify-between p-4 rounded-xl border border-gray-200 bg-slate-50/70 hover:bg-white hover:border-brand-300 hover:shadow-xs transition-all space-y-3 relative group"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">
+                    Layer {layer.step}
+                  </span>
+                  {idx < layers.length - 1 && (
+                    <ArrowRight className="w-4 h-4 text-gray-400 hidden md:block group-hover:text-brand-600 transition-colors" />
+                  )}
+                </div>
+                <div className="text-sm font-bold text-gray-900 mt-2">{layer.name}</div>
+                <div className="text-xs font-mono font-semibold text-brand-600 mt-0.5">{layer.tools}</div>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed pt-2 border-t border-gray-200/80">
+                {layer.description}
               </p>
             </div>
-            <div className="space-y-1.5 font-mono text-[10px] text-slate-300 bg-slate-900/60 p-2.5 rounded border border-slate-800">
-              <div>&bull; Wazuh EDR Agent</div>
-              <div>&bull; Sysmon / Auditd</div>
-              <div>&bull; CloudTrail / Azure IDP</div>
-              <div>&bull; Suricata / Zeek PCAP</div>
-            </div>
-          </div>
-
-          {/* Layer 2: Pipeline & Storage */}
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 flex flex-col justify-between">
-            <div>
-              <div className="text-[10px] font-mono uppercase text-blue-400 font-bold mb-1">Layer 2: Storage</div>
-              <h3 className="text-xs font-bold text-white">Elasticsearch / SIEM</h3>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Logstash and Kafka buffer streams into Elasticsearch indices for fast query retrieval.
-              </p>
-            </div>
-            <div className="space-y-1.5 font-mono text-[10px] text-slate-300 bg-slate-900/60 p-2.5 rounded border border-slate-800">
-              <div>&bull; Elasticsearch Cluster</div>
-              <div>&bull; Apache Kafka Queue</div>
-              <div>&bull; Splunk / Chronicle</div>
-              <div>&bull; OpenSearch Ingestion</div>
-            </div>
-          </div>
-
-          {/* Layer 3: KAVACH-AI Engine */}
-          <div className="p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/50 space-y-3 flex flex-col justify-between shadow-lg shadow-cyan-950/40">
-            <div>
-              <div className="text-[10px] font-mono uppercase text-cyan-300 font-bold mb-1">Layer 3: Resilience</div>
-              <h3 className="text-xs font-bold text-white">KAVACH-AI Detection</h3>
-              <p className="text-[11px] text-slate-300 mt-1">
-                Hybrid scikit-learn models (Isolation Forest + HistGB) combined with Sigma rules.
-              </p>
-            </div>
-            <div className="space-y-1.5 font-mono text-[10px] text-cyan-300 bg-slate-900/90 p-2.5 rounded border border-cyan-800">
-              <div>&bull; Isolation Forest (Volume)</div>
-              <div>&bull; HistGB (PortScan Patterns)</div>
-              <div>&bull; Sigma Rules Engine</div>
-              <div>&bull; 3-Way Composite Risk</div>
-            </div>
-          </div>
-
-          {/* Layer 4: Correlation & AI */}
-          <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-500/50 space-y-3 flex flex-col justify-between shadow-lg shadow-purple-950/40">
-            <div>
-              <div className="text-[10px] font-mono uppercase text-purple-300 font-bold mb-1">Layer 4: Triage</div>
-              <h3 className="text-xs font-bold text-white">NetworkX + Gemini</h3>
-              <p className="text-[11px] text-slate-300 mt-1">
-                NetworkX graph clusters alerts into 1 incident; Gemini synthesizes kill-chain narrative.
-              </p>
-            </div>
-            <div className="space-y-1.5 font-mono text-[10px] text-purple-300 bg-slate-900/90 p-2.5 rounded border border-purple-800">
-              <div>&bull; NetworkX Entity Graph</div>
-              <div>&bull; MITRE ATT&amp;CK Mapping</div>
-              <div>&bull; Prompt Shield Defense</div>
-              <div>&bull; Confidence Calibration</div>
-            </div>
-          </div>
-
-          {/* Layer 5: SOAR & Execution */}
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 flex flex-col justify-between">
-            <div>
-              <div className="text-[10px] font-mono uppercase text-emerald-400 font-bold mb-1">Layer 5: Response</div>
-              <h3 className="text-xs font-bold text-white">SOAR &amp; Human Approval</h3>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Autonomous low-risk containment + analyst approval gate for high-impact host isolation.
-              </p>
-            </div>
-            <div className="space-y-1.5 font-mono text-[10px] text-slate-300 bg-slate-900/60 p-2.5 rounded border border-slate-800">
-              <div>&bull; Firewall IP Drop (Auto)</div>
-              <div>&bull; Token Revoke (Auto)</div>
-              <div>&bull; EDR Host Isolation (Approve)</div>
-              <div>&bull; AD Account Lock (Approve)</div>
-            </div>
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Technical Architecture Notes */}
-        <div className="pt-4 border-t border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
-            <div className="text-cyan-400 font-bold mb-1">Enterprise Scalability</div>
-            <p className="text-slate-400 text-[11px]">
-              Microservices deployed on Kubernetes with Redis pub/sub queues, capable of processing &gt;50,000 EPS (events per second) with horizontal worker autoscaling.
-            </p>
-          </div>
-
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
-            <div className="text-purple-400 font-bold mb-1">Zero Trust Governance</div>
-            <p className="text-slate-400 text-[11px]">
-              Prompt Shield boundary enforcement prevents prompt injections. Append-only tamper-evident audit logs exportable for SOC 2 Type II and ISO 27001 compliance.
-            </p>
-          </div>
-
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
-            <div className="text-emerald-400 font-bold mb-1">SOAR Ecosystem Ready</div>
-            <p className="text-slate-400 text-[11px]">
-              Prebuilt webhooks and API schemas for Palo Alto Cortex XSOAR, Splunk SOAR, Tines, and Shuffle open-source automation engines.
-            </p>
-          </div>
-        </div>
+      {/* Implementation Notes */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <h3 className="text-base font-bold text-gray-900">Implementation notes</h3>
+        <ul className="space-y-3 text-xs text-gray-600 leading-relaxed">
+          <li className="flex items-start space-x-2.5">
+            <span className="text-brand-600 font-bold text-base leading-none">&bull;</span>
+            <span>
+              <strong className="text-gray-900 font-semibold">Scalability:</strong> Designed to scale horizontally by running stateless FastAPI inference workers behind a load balancer with a Redis queue.
+            </span>
+          </li>
+          <li className="flex items-start space-x-2.5">
+            <span className="text-brand-600 font-bold text-base leading-none">&bull;</span>
+            <span>
+              <strong className="text-gray-900 font-semibold">Integrations:</strong> Connects to existing security pipelines through standard REST APIs and webhook payloads compatible with Wazuh and SOAR engines.
+            </span>
+          </li>
+          <li className="flex items-start space-x-2.5">
+            <span className="text-brand-600 font-bold text-base leading-none">&bull;</span>
+            <span>
+              <strong className="text-gray-900 font-semibold">Audit accountability:</strong> Every detection score, correlation grouping, triage assessment, and containment action is logged in an append-only audit trail with SHA-256 cryptographic hash chaining.
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
   );

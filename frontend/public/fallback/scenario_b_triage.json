@@ -1,38 +1,38 @@
 {
   "incident_id": "INC-2026-0001",
-  "what_likely_happened": "An attacker compromised the user workstation WS-ENG-088 and performed a network port scan to map internal services. They then used lateral movement via SMB/Admin shares with the svc_deploy service account to access SRV-APP-03, subsequently reusing credentials across production servers before performing LSASS process memory access on SRV-DB-PROD for privilege escalation.",
+  "what_likely_happened": "An attacker compromised the workstation WS-ENG-088 under the user alex.chen and performed network service discovery via a subnet port scan. Subsequently, they leveraged the svc_deploy service account to execute PsExec lateral movement to SRV-APP-03, reusing credentials across critical servers before ultimately executing LSASS memory access on SRV-DB-PROD to harvest credentials and escalate privileges.",
   "evidence": [
     {
       "event_id": "EVT-B-01",
       "technique_id": "T1046",
       "technique_name": "Network Service Discovery",
       "finding": "Subnet Port Scan Detected on Internal Segment",
-      "detail": "Host WS-ENG-088 initiated SYN scan targeting 254 endpoints on 10.0.4.0/24 across ports 22, 135, 445, 3389, 8080"
+      "detail": "Host WS-ENG-088 initiated SYN scan targeting 254 endpoints on 10.0.4.0/24 across ports 22, 135, 445, 3389, 8080."
     },
     {
       "event_id": "EVT-B-02",
       "technique_id": "T1021.002",
       "technique_name": "Remote Services: SMB/Windows Admin Shares",
       "finding": "PsExec Remote Service Execution via Admin Share",
-      "detail": "Service installation detected: PSEXESVC created on SRV-APP-03 from source WS-ENG-088 using credential svc_deploy"
+      "detail": "Service installation detected: PSEXESVC created on SRV-APP-03 from source WS-ENG-088 using credential svc_deploy."
     },
     {
       "event_id": "EVT-B-03",
       "technique_id": "T1078.002",
       "technique_name": "Valid Accounts: Domain Accounts",
       "finding": "Service Account Credential Reuse Across Production Tier",
-      "detail": "Account svc_deploy authenticated concurrently across SRV-APP-03, SRV-DB-PROD, and SRV-AUTH-01 within 2 minutes"
+      "detail": "Account svc_deploy authenticated concurrently across SRV-APP-03, SRV-DB-PROD, and SRV-AUTH-01 within 2 minutes."
     },
     {
       "event_id": "EVT-B-04",
       "technique_id": "T1068",
       "technique_name": "Exploitation for Privilege Escalation",
       "finding": "Privilege Escalation via Memory Injection & LSASS Access",
-      "detail": "Process rundll32.exe opened handle with PROCESS_ALL_ACCESS to lsass.exe on SRV-DB-PROD to dump NTDS / memory secrets"
+      "detail": "Process rundll32.exe opened handle with PROCESS_ALL_ACCESS to lsass.exe on SRV-DB-PROD to dump NTDS / memory secrets."
     }
   ],
   "confidence_score": 95,
-  "confidence_reason": "All events contain fully populated hostnames, valid usernames, specific MITRE techniques, and follow a clear, coherent progression through the attacker kill chain without missing fields or adversarial tampering.",
+  "confidence_reason": "High confidence due to clear, sequential, and fully attributed telemetry logs mapping the entire kill chain from reconnaissance through lateral movement and credential dumping without any missing or ambiguous hosts/users.",
   "recommended_actions": [
     {
       "id": "ACT-B-01",

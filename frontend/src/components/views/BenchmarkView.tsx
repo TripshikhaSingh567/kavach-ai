@@ -1,166 +1,176 @@
 "use client";
 
-import React, { useState } from "react";
-import { BarChart3, TrendingUp, TrendingDown, Clock, ShieldCheck, CheckCircle2, AlertTriangle, Camera } from "lucide-react";
+import React from "react";
+import { Camera, TrendingUp, TrendingDown, ArrowRight, ShieldCheck, Zap, Clock, UserCheck } from "lucide-react";
 
 interface BenchmarkViewProps {
   benchmarkData: any;
+  isScreenshotMode?: boolean;
+  onToggleScreenshotMode?: () => void;
 }
 
-export const BenchmarkView: React.FC<BenchmarkViewProps> = ({ benchmarkData }) => {
-  const [slideMode, setSlideMode] = useState<boolean>(false);
-
+export const BenchmarkView: React.FC<BenchmarkViewProps> = ({
+  benchmarkData,
+  isScreenshotMode = false,
+  onToggleScreenshotMode,
+}) => {
   const comparisons = benchmarkData?.detailed_comparison || [];
   const baseline = benchmarkData?.baseline_summary || {};
   const kavach = benchmarkData?.kavach_summary || {};
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="p-5 rounded-xl border border-soc-border bg-soc-card shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Page Header (hidden in screenshot mode) */}
+      {!isScreenshotMode && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                Empirical Evaluation
-              </span>
-              <span className="text-xs font-mono text-slate-400">Reproducible Benchmark</span>
-            </div>
-            <h1 className="text-lg font-black text-white mt-1">Rule-Only Baseline vs. KAVACH-AI Autonomous Engine</h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Live quantitative comparison across Scenario A &amp; Scenario B. All values computed dynamically from real runs.
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Benchmark</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Quantitative comparison of rule-based baseline versus KAVACH-AI on simulated test scenarios.
             </p>
           </div>
 
-          <button
-            onClick={() => setSlideMode(!slideMode)}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
-              slideMode
-                ? "bg-cyan-500 text-slate-950 border-cyan-400"
-                : "bg-slate-800 text-slate-300 border-slate-700 hover:text-white"
-            }`}
-          >
-            <Camera className="w-4 h-4" />
-            <span>{slideMode ? "Exit Slide Screenshot Mode" : "Slide Screenshot Mode"}</span>
-          </button>
+          {onToggleScreenshotMode && (
+            <button
+              onClick={onToggleScreenshotMode}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold transition-all shadow-xs self-start sm:self-auto"
+            >
+              <Camera className="w-4 h-4 text-gray-500" />
+              <span>Slide screenshot mode</span>
+            </button>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* Screenshot-Ready Results Table for Slides */}
-      <div className="rounded-xl border border-soc-border bg-soc-card shadow-2xl overflow-hidden p-1">
-        <div className="p-4 border-b border-soc-border bg-slate-900/60 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <BarChart3 className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-sm font-black tracking-wide text-white">
-              PERFORMANCE BENCHMARK MATRIX (REAL COMPUTED RUNS)
-            </h2>
+      {/* Main Comparison Table */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Evaluation results</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              All metrics calculated from actual scenario runs.
+            </p>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
-            Slide Deck Ready &bull; Zero Hardcoded Numbers
-          </span>
+
+          {isScreenshotMode && onToggleScreenshotMode && (
+            <button
+              onClick={onToggleScreenshotMode}
+              className="text-xs text-brand-600 hover:text-brand-700 font-semibold underline"
+            >
+              Exit screenshot mode
+            </button>
+          )}
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-800">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50/75 text-gray-500 font-semibold text-[11px] uppercase tracking-wider border-b border-gray-200">
               <tr>
-                <th className="px-5 py-3.5">Evaluation Metric</th>
-                <th className="px-5 py-3.5">Traditional SIEM (Rule-Only Baseline)</th>
-                <th className="px-5 py-3.5 bg-cyan-950/20 text-cyan-300 border-x border-cyan-800/40">
-                  KAVACH-AI (Autonomous Resilience)
+                <th className="py-3.5 px-6">Metric</th>
+                <th className="py-3.5 px-6">Rule-based baseline</th>
+                <th className="py-3.5 px-6 bg-brand-50/60 text-brand-700 border-x border-gray-200 font-bold">
+                  KAVACH-AI
                 </th>
-                <th className="px-5 py-3.5 text-right">Net Operational Gain</th>
+                <th className="py-3.5 px-6 text-right">Change</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 font-sans">
-              {comparisons.map((row: any, idx: number) => (
-                <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-4 font-bold text-white text-xs">
-                    {row.metric}
-                  </td>
-                  <td className="px-5 py-4 font-mono text-slate-300">
-                    <span className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800">
+            <tbody className="divide-y divide-gray-100">
+              {comparisons.map((row: any, idx: number) => {
+                return (
+                  <tr key={idx} className="hover:bg-gray-50/60 transition-colors">
+                    {/* Metric name */}
+                    <td className="py-4 px-6 font-semibold text-gray-900">
+                      {row.metric}
+                    </td>
+
+                    {/* Baseline */}
+                    <td className="py-4 px-6 font-mono text-xs text-gray-600">
                       {row.baseline}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 font-mono font-bold text-cyan-300 bg-cyan-950/20 border-x border-cyan-800/40">
-                    <span className="px-2.5 py-1 rounded bg-cyan-950/60 border border-cyan-700/60 text-white">
+                    </td>
+
+                    {/* KAVACH-AI */}
+                    <td className="py-4 px-6 font-mono text-xs font-bold text-brand-700 bg-brand-50/40 border-x border-gray-200">
                       {row.kavach_ai}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-right font-mono font-bold">
-                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      <span>{row.improvement}</span>
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+
+                    {/* Change */}
+                    <td className="py-4 px-6 text-right font-mono text-xs font-semibold text-emerald-700">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span>{row.improvement}</span>
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
-        {/* Disclaimer Note */}
-        <div className="p-4 bg-slate-950/90 border-t border-slate-800/80 text-[11px] text-slate-400 font-mono flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-amber-400">&bull;</span>
-            <span>
-              <strong>Note:</strong> Benchmark evaluated against CIC-IDS2017 stratified network flows and seeded kill chains. Data is simulated for hackathon evaluation.
-            </span>
+        {/* Short Note: Data is simulated */}
+        <div className="px-6 py-3.5 bg-gray-50/75 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between">
+          <div>
+            Note: Performance evaluated against CIC-IDS2017 stratified port scan sample and seeded test scenarios. Data is simulated.
           </div>
-          <span className="text-slate-500 hidden md:inline">KAVACH-AI Benchmark Suite v1.0</span>
+          <span className="text-gray-400 font-mono text-[11px] hidden md:inline">
+            CIC-IDS2017 Sample (6,000 Flows)
+          </span>
         </div>
       </div>
 
-      {/* Visual Comparison Cards */}
-      {!slideMode && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl border border-soc-border bg-soc-card space-y-2">
-            <div className="text-xs font-mono uppercase text-slate-400">Detection Recall</div>
-            <div className="flex items-baseline justify-between font-mono">
-              <span className="text-2xl font-black text-white">{kavach.detection_rate_pct ?? 100}%</span>
-              <span className="text-xs text-slate-500">vs {baseline.detection_rate_pct ?? 35}% base</span>
+      {/* 4 Summary Stat Cards matching SecurePay */}
+      {!isScreenshotMode && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                DETECTION RATE
+              </div>
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-              <div className="bg-emerald-400 h-2 rounded-full" style={{ width: `${kavach.detection_rate_pct ?? 100}%` }} />
+            <div className="text-3xl font-bold text-gray-900 tracking-tight mt-2">
+              {kavach.detection_rate_pct ?? 100}%
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Zero undetected kill chain stages.</div>
+            <div className="text-xs text-gray-500 mt-1">vs {baseline.detection_rate_pct ?? 35}% baseline</div>
           </div>
 
-          <div className="p-4 rounded-xl border border-soc-border bg-soc-card space-y-2">
-            <div className="text-xs font-mono uppercase text-slate-400">False Positive Rate</div>
-            <div className="flex items-baseline justify-between font-mono">
-              <span className="text-2xl font-black text-cyan-400">{kavach.false_positive_rate_pct ?? 0}%</span>
-              <span className="text-xs text-rose-400">vs {baseline.false_positive_rate_pct ?? 17}% base</span>
+          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                FALSE POSITIVE RATE
+              </div>
+              <Zap className="w-4 h-4 text-brand-600" />
             </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-              <div className="bg-cyan-400 h-2 rounded-full" style={{ width: `5%` }} />
+            <div className="text-3xl font-bold text-brand-600 tracking-tight mt-2">
+              {kavach.false_positive_rate_pct ?? 0}%
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Suppressed vulnerability scanner noise.</div>
+            <div className="text-xs text-gray-500 mt-1">vs {baseline.false_positive_rate_pct ?? 17}% baseline</div>
           </div>
 
-          <div className="p-4 rounded-xl border border-soc-border bg-soc-card space-y-2">
-            <div className="text-xs font-mono uppercase text-slate-400">Mean Time to Respond</div>
-            <div className="flex items-baseline justify-between font-mono">
-              <span className="text-2xl font-black text-emerald-400">{kavach.mttr_minutes ?? 2.4} min</span>
-              <span className="text-xs text-slate-500">vs {baseline.mttr_minutes ?? 52} min</span>
+          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                MEAN TIME TO RESPOND
+              </div>
+              <Clock className="w-4 h-4 text-gray-400" />
             </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-              <div className="bg-emerald-400 h-2 rounded-full" style={{ width: `8%` }} />
+            <div className="text-3xl font-bold text-gray-900 tracking-tight mt-2">
+              {kavach.mttr_minutes ?? 2.4} min
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Zero latency autonomous containment.</div>
+            <div className="text-xs text-gray-500 mt-1">vs {baseline.mttr_minutes ?? 52} min baseline</div>
           </div>
 
-          <div className="p-4 rounded-xl border border-soc-border bg-soc-card space-y-2">
-            <div className="text-xs font-mono uppercase text-slate-400">Analyst Alert Fatigue</div>
-            <div className="flex items-baseline justify-between font-mono">
-              <span className="text-2xl font-black text-purple-400">1 Incident</span>
-              <span className="text-xs text-slate-500">vs {baseline.analyst_effort_items ?? 7} tickets</span>
+          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                ANALYST EFFORT
+              </div>
+              <UserCheck className="w-4 h-4 text-brand-600" />
             </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-              <div className="bg-purple-400 h-2 rounded-full" style={{ width: `15%` }} />
+            <div className="text-3xl font-bold text-gray-900 tracking-tight mt-2">
+              1 correlated incident
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Unified graph clustering eliminates ticket fatigue.</div>
+            <div className="text-xs text-gray-500 mt-1">vs {baseline.analyst_effort_items ?? 7} disjoint tickets</div>
           </div>
         </div>
       )}

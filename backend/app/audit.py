@@ -1,9 +1,11 @@
 import threading
+import hashlib
 from datetime import datetime, timezone
 
 _LOCK = threading.Lock()
 _AUDIT_LOGS = []
 _LOG_COUNTER = 1
+_LAST_HASH = "0000000000000000000000000000000000000000000000000000000000000000"
 
 def append_audit_entry(
     actor: str,
@@ -13,18 +15,28 @@ def append_audit_entry(
     reason: str,
     metadata: dict = None
 ) -> dict:
-    global _LOG_COUNTER, _AUDIT_LOGS
+    global _LOG_COUNTER, _AUDIT_LOGS, _LAST_HASH
     with _LOCK:
+        ts = datetime.now(timezone.utc).isoformat()
+        entry_id = f"AUD-{_LOG_COUNTER:05d}"
+        
+        # Cryptographic SHA-256 hash chain
+        payload_to_hash = f"{entry_id}|{ts}|{actor}|{category}|{action}|{target}|{_LAST_HASH}"
+        current_hash = hashlib.sha256(payload_to_hash.encode("utf-8")).hexdigest()
+
         entry = {
-            "id": f"AUD-{_LOG_COUNTER:05d}",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "id": entry_id,
+            "timestamp": ts,
             "actor": actor,
             "category": category,
             "action": action,
             "target": target,
             "reason": reason,
+            "previous_hash": _LAST_HASH,
+            "hash": current_hash,
             "metadata": metadata or {}
         }
+        _LAST_HASH = current_hash
         _LOG_COUNTER += 1
         _AUDIT_LOGS.insert(0, entry) # Most recent first
         return entry
@@ -38,16 +50,16 @@ def seed_initial_audit():
         append_audit_entry(
             actor="SYSTEM",
             category="STARTUP",
-            action="ENGINE_INITIALIZED",
+            action="Engine initialised",
             target="KAVACH-AI Core",
-            reason="FastAPI backend and scikit-learn models (Isolation Forest + HistGradientBoosting) loaded successfully."
+            reason="FastAPI service and scikit-learn detection models (Isolation Forest and gradient boosting) loaded."
         )
         append_audit_entry(
             actor="SYSTEM",
             category="DEFENSE",
-            action="PROMPT_SHIELD_ARMED",
-            target="Triage Agent Pipeline",
-            reason="Adversarial prompt injection filters initialized with heuristic boundary enforcement."
+            action="Prompt filter active",
+            target="Triage agent pipeline",
+            reason="Heuristic boundary filter initialized to sanitize adversarial directives in log payloads."
         )
 
 seed_initial_audit()

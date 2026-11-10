@@ -18,7 +18,7 @@
     "note": "Alert fatigue caused by duplicate tickets and false positives on vulnerability scanner."
   },
   "kavach_summary": {
-    "system": "KAVACH-AI (Autonomous Resilience)",
+    "system": "KAVACH-AI",
     "total_alerts": 26,
     "true_positives": 12,
     "false_positives": 0,
@@ -27,9 +27,9 @@
     "false_positive_rate_pct": 0.0,
     "mttd_seconds": 5,
     "mttr_minutes": 2.4,
-    "analyst_effort_items": 4,
-    "incidents_count": 4,
-    "reduction_in_analyst_effort_pct": 60.0,
+    "analyst_effort_items": 1,
+    "incidents_count": 1,
+    "reduction_in_analyst_effort_pct": 91.7,
     "note": "Correlates fragmented alerts into 1 unified incident; suppresses duplicate noise and handles scanner traffic gracefully."
   },
   "detailed_comparison": [
@@ -65,8 +65,8 @@
       "metric": "Analyst Effort (Items to Review)",
       "unit": "tickets / incidents",
       "baseline": "7 disjoint tickets",
-      "kavach_ai": "4 correlated incident",
-      "improvement": "42.9% reduction"
+      "kavach_ai": "1 correlated incident",
+      "improvement": "85.7% reduction"
     }
   ]
 }

@@ -1,38 +1,38 @@
 {
   "incident_id": "INC-2026-0001",
-  "what_likely_happened": "An attacker compromised user sarah.jenkins via a targeted phishing link, subsequently performing an impossible travel login to hijack the cloud session. The adversary established an email forwarding rule to collect sensitive financial communications before mass-downloading restricted financial audit spreadsheets and payroll archives for exfiltration.",
+  "what_likely_happened": "An attacker compromised user sarah.jenkins via a targeted phishing link, subsequently performing an impossible travel authentication from Romania to hijack the cloud session. The adversary established an email forwarding rule to intercept financial communications and rapidly exfiltrated sensitive audit and payroll archives from a shared server.",
   "evidence": [
     {
       "event_id": "EVT-A-01",
       "technique_id": "T1566.002",
       "technique_name": "Phishing: Spearphishing Link",
-      "finding": "User accessed external phishing domain",
-      "detail": "User sarah.jenkins clicked link to login-microsoft-auth.secure-verify.net/reset from host WS-FIN-042."
+      "finding": "User clicked a phishing lure link.",
+      "detail": "User sarah.jenkins accessed external domain login-microsoft-auth.secure-verify.net/reset from host WS-FIN-042."
     },
     {
       "event_id": "EVT-A-02",
       "technique_id": "T1078.004",
       "technique_name": "Valid Accounts: Cloud Accounts",
-      "finding": "Anomalous geolocation authentication",
-      "detail": "Successful authentication from Bucharest, Romania 6 minutes after London login, indicating session compromise."
+      "finding": "Impossible travel authentication detected.",
+      "detail": "Successful authentication from Bucharest, Romania 6 minutes after a login in London, UK."
     },
     {
       "event_id": "EVT-A-03",
       "technique_id": "T1114.003",
       "technique_name": "Email Collection: Email Forwarding Rule",
-      "finding": "Mailbox rule created for collection",
-      "detail": "Exchange Online inbox rule created to forward financial emails to drop-audit-q4@protonmail.com."
+      "finding": "Malicious inbox rule created for financial espionage.",
+      "detail": "Rule configured to forward messages containing 'wire', 'invoice', and 'statement' to an external ProtonMail address."
     },
     {
       "event_id": "EVT-A-04",
       "technique_id": "T1020",
       "technique_name": "Automated Exfiltration",
-      "finding": "High-volume sensitive SMB share access",
-      "detail": "Downloaded 48 restricted financial audit spreadsheets and payroll archives from SRV-SHARE-01 within 45 seconds."
+      "finding": "High-volume access and download of restricted files.",
+      "detail": "48 restricted financial audit spreadsheets and payroll archives downloaded from SRV-SHARE-01 within 45 seconds."
     }
   ],
   "confidence_score": 54,
-  "confidence_reason": "Confidence score lowered below 60% due to the presence of fragmented and missing host/user telemetry in event EVT-ROBUST-MISSING_scenario_a.",
+  "confidence_reason": "Although clear telemetry exists for the attack chain, rule 1 dictates lowering the confidence score below 60% due to the presence of an event (EVT-ROBUST-MISSING_scenario_a) containing missing and fragmented host/user data.",
   "recommended_actions": [
     {
       "id": "ACT-A-01",
@@ -64,7 +64,7 @@
     {
       "id": "ACT-A-04",
       "action_type": "ISOLATE_HOST",
-      "target": "AZURE-IDP-01",
+      "target": "SRV-SHARE-01",
       "impact": "HIGH",
       "status": "pending",
       "title": "Network Isolation of Financial Workstation",

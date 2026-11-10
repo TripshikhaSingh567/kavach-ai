@@ -264,19 +264,19 @@
         }
       ],
       "hosts": [
-        "SRV-APP-03",
+        "WS-ENG-088",
         "SRV-DB-PROD",
-        "WS-ENG-088"
+        "SRV-APP-03"
       ],
       "users": [
-        "alex.chen",
         "svc_deploy",
-        "SYSTEM"
+        "SYSTEM",
+        "alex.chen"
       ],
       "ips": [
         "10.0.2.50",
-        "10.0.4.88",
-        "10.0.4.15"
+        "10.0.4.15",
+        "10.0.4.88"
       ],
       "mitre_techniques": [
         {
@@ -308,8 +308,8 @@
             "id": "graph-node-EVT-B-01",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-B-01",
@@ -322,7 +322,8 @@
               "risk_score": 80.7,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:31:30+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": false
             }
           },
           {
@@ -330,7 +331,7 @@
             "type": "mitreNode",
             "position": {
               "x": 360,
-              "y": 180
+              "y": 140
             },
             "data": {
               "event_id": "EVT-B-02",
@@ -343,15 +344,16 @@
               "risk_score": 81.3,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:38:00+00:00",
-              "step_number": 2
+              "step_number": 2,
+              "is_missing_logs": false
             }
           },
           {
             "id": "graph-node-EVT-B-03",
             "type": "mitreNode",
             "position": {
-              "x": 640,
-              "y": 120
+              "x": 680,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-B-03",
@@ -364,15 +366,16 @@
               "risk_score": 78.3,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:44:00+00:00",
-              "step_number": 3
+              "step_number": 3,
+              "is_missing_logs": false
             }
           },
           {
             "id": "graph-node-EVT-B-04",
             "type": "mitreNode",
             "position": {
-              "x": 920,
-              "y": 180
+              "x": 1000,
+              "y": 140
             },
             "data": {
               "event_id": "EVT-B-04",
@@ -385,7 +388,8 @@
               "risk_score": 81.9,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:52:00+00:00",
-              "step_number": 4
+              "step_number": 4,
+              "is_missing_logs": false
             }
           }
         ],
@@ -395,9 +399,8 @@
             "source": "graph-node-EVT-B-01",
             "target": "graph-node-EVT-B-02",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           },
@@ -406,9 +409,8 @@
             "source": "graph-node-EVT-B-02",
             "target": "graph-node-EVT-B-03",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           },
@@ -417,9 +419,8 @@
             "source": "graph-node-EVT-B-03",
             "target": "graph-node-EVT-B-04",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           }
@@ -523,8 +524,8 @@
             "id": "graph-node-EVT-FP-01_scenario_b",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-FP-01_scenario_b",
@@ -537,7 +538,8 @@
               "risk_score": 51.0,
               "severity": "MEDIUM",
               "timestamp": "2026-11-10T08:35:10+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": false
             }
           }
         ],
@@ -641,8 +643,8 @@
             "id": "graph-node-EVT-ROBUST-INJECT_scenario_b",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-ROBUST-INJECT_scenario_b",
@@ -655,7 +657,8 @@
               "risk_score": 77.1,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:40:50+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": false
             }
           }
         ],
@@ -730,8 +733,8 @@
       "hosts": [],
       "users": [],
       "ips": [
-        "10.0.1.20",
-        "UNKNOWN_EXTERNAL"
+        "UNKNOWN_EXTERNAL",
+        "10.0.1.20"
       ],
       "mitre_techniques": [],
       "first_seen": "2026-11-10T08:45:50+00:00",
@@ -742,21 +745,22 @@
             "id": "graph-node-EVT-ROBUST-MISSING_scenario_b",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-ROBUST-MISSING_scenario_b",
               "title": "Fragmented NetFlow Record [Incomplete Telemetry]",
-              "technique_id": null,
-              "technique_name": "Uncorrelated Anomaly",
-              "host": null,
-              "user": null,
+              "technique_id": "DEGRADED",
+              "technique_name": "Incomplete telemetry",
+              "host": "N/A",
+              "user": "N/A",
               "ip": "UNKNOWN_EXTERNAL",
               "risk_score": 64.5,
               "severity": "HIGH",
               "timestamp": "2026-11-10T08:45:50+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": true
             }
           }
         ],

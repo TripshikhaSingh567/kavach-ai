@@ -311,22 +311,22 @@
         }
       ],
       "hosts": [
-        "AZURE-IDP-01",
-        "EXCH-CAS-01",
         "SRV-SHARE-01",
-        "WS-FIN-042"
+        "WS-FIN-042",
+        "EXCH-CAS-01",
+        "AZURE-IDP-01"
       ],
       "users": [
         "sarah.jenkins"
       ],
       "ips": [
-        "10.0.1.20",
-        "10.0.0.8",
+        "198.51.100.23",
         "10.0.12.42",
         "185.220.101.5",
         "10.0.0.5",
-        "UNKNOWN_EXTERNAL",
-        "198.51.100.23"
+        "10.0.1.20",
+        "10.0.0.8",
+        "UNKNOWN_EXTERNAL"
       ],
       "mitre_techniques": [
         {
@@ -358,8 +358,8 @@
             "id": "graph-node-EVT-A-01",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-A-01",
@@ -372,7 +372,8 @@
               "risk_score": 78.9,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:31:00+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": false
             }
           },
           {
@@ -380,7 +381,7 @@
             "type": "mitreNode",
             "position": {
               "x": 360,
-              "y": 180
+              "y": 140
             },
             "data": {
               "event_id": "EVT-A-02",
@@ -393,15 +394,16 @@
               "risk_score": 79.5,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:37:00+00:00",
-              "step_number": 2
+              "step_number": 2,
+              "is_missing_logs": false
             }
           },
           {
             "id": "graph-node-EVT-A-03",
             "type": "mitreNode",
             "position": {
-              "x": 640,
-              "y": 120
+              "x": 680,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-A-03",
@@ -414,36 +416,38 @@
               "risk_score": 80.1,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:43:00+00:00",
-              "step_number": 3
+              "step_number": 3,
+              "is_missing_logs": false
             }
           },
           {
             "id": "graph-node-EVT-ROBUST-MISSING_scenario_a",
             "type": "mitreNode",
             "position": {
-              "x": 920,
-              "y": 180
+              "x": 1000,
+              "y": 140
             },
             "data": {
               "event_id": "EVT-ROBUST-MISSING_scenario_a",
               "title": "Fragmented NetFlow Record [Incomplete Telemetry]",
-              "technique_id": null,
-              "technique_name": "Uncorrelated Anomaly",
-              "host": null,
-              "user": null,
+              "technique_id": "DEGRADED",
+              "technique_name": "Incomplete telemetry",
+              "host": "N/A",
+              "user": "N/A",
               "ip": "UNKNOWN_EXTERNAL",
               "risk_score": 64.5,
               "severity": "HIGH",
               "timestamp": "2026-11-10T08:45:50+00:00",
-              "step_number": 4
+              "step_number": 4,
+              "is_missing_logs": true
             }
           },
           {
             "id": "graph-node-EVT-A-04",
             "type": "mitreNode",
             "position": {
-              "x": 1200,
-              "y": 120
+              "x": 1320,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-A-04",
@@ -456,7 +460,8 @@
               "risk_score": 78.0,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:50:50+00:00",
-              "step_number": 5
+              "step_number": 5,
+              "is_missing_logs": false
             }
           }
         ],
@@ -466,9 +471,8 @@
             "source": "graph-node-EVT-A-01",
             "target": "graph-node-EVT-A-02",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           },
@@ -477,9 +481,8 @@
             "source": "graph-node-EVT-A-02",
             "target": "graph-node-EVT-A-03",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           },
@@ -488,9 +491,8 @@
             "source": "graph-node-EVT-A-03",
             "target": "graph-node-EVT-ROBUST-MISSING_scenario_a",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           },
@@ -499,9 +501,8 @@
             "source": "graph-node-EVT-ROBUST-MISSING_scenario_a",
             "target": "graph-node-EVT-A-04",
             "animated": true,
-            "label": "Attack Progression",
             "style": {
-              "stroke": "#06b6d4",
+              "stroke": "#0F766E",
               "strokeWidth": 2
             }
           }
@@ -605,8 +606,8 @@
             "id": "graph-node-EVT-FP-01_scenario_a",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-FP-01_scenario_a",
@@ -619,7 +620,8 @@
               "risk_score": 51.0,
               "severity": "MEDIUM",
               "timestamp": "2026-11-10T08:35:10+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": false
             }
           }
         ],
@@ -723,8 +725,8 @@
             "id": "graph-node-EVT-ROBUST-INJECT_scenario_a",
             "type": "mitreNode",
             "position": {
-              "x": 80,
-              "y": 120
+              "x": 40,
+              "y": 100
             },
             "data": {
               "event_id": "EVT-ROBUST-INJECT_scenario_a",
@@ -737,7 +739,8 @@
               "risk_score": 77.1,
               "severity": "CRITICAL",
               "timestamp": "2026-11-10T08:40:50+00:00",
-              "step_number": 1
+              "step_number": 1,
+              "is_missing_logs": false
             }
           }
         ],

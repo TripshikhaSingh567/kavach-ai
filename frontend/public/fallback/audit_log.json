@@ -2,22 +2,26 @@
   "logs": [
     {
       "id": "AUD-00002",
-      "timestamp": "2026-11-10T04:47:30.128577+00:00",
+      "timestamp": "2026-11-10T19:00:22.751078+00:00",
       "actor": "SYSTEM",
       "category": "DEFENSE",
-      "action": "PROMPT_SHIELD_ARMED",
-      "target": "Triage Agent Pipeline",
-      "reason": "Adversarial prompt injection filters initialized with heuristic boundary enforcement.",
+      "action": "Prompt filter active",
+      "target": "Triage agent pipeline",
+      "reason": "Heuristic boundary filter initialized to sanitize adversarial directives in log payloads.",
+      "previous_hash": "05eacc4d252b315dc2924e184bddac4037d34a59861116fb9636b60c798e2258",
+      "hash": "ef11a5e5ad6f4471a42d918f3220f1a79a6d422e7ab509cc4dda44fe535fb819",
       "metadata": {}
     },
     {
       "id": "AUD-00001",
-      "timestamp": "2026-11-10T04:47:30.128554+00:00",
+      "timestamp": "2026-11-10T19:00:22.750273+00:00",
       "actor": "SYSTEM",
       "category": "STARTUP",
-      "action": "ENGINE_INITIALIZED",
+      "action": "Engine initialised",
       "target": "KAVACH-AI Core",
-      "reason": "FastAPI backend and scikit-learn models (Isolation Forest + HistGradientBoosting) loaded successfully.",
+      "reason": "FastAPI service and scikit-learn detection models (Isolation Forest and gradient boosting) loaded.",
+      "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "05eacc4d252b315dc2924e184bddac4037d34a59861116fb9636b60c798e2258",
       "metadata": {}
     }
   ]

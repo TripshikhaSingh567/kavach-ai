@@ -2,67 +2,102 @@
 
 import React, { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
-import { ShieldAlert, Terminal, User, Server, Network } from "lucide-react";
+import { Server, User, Globe } from "lucide-react";
 
 export const MitreNode = memo(({ data }: { data: any }) => {
   const isCritical = data.risk_score >= 80;
   const isHigh = data.risk_score >= 60 && data.risk_score < 80;
+  const isIncomplete = data.is_missing_logs || data.technique_id === "DEGRADED";
+
+  const getSeverityBadge = () => {
+    if (isIncomplete) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+          <span>Incomplete telemetry</span>
+        </span>
+      );
+    }
+    if (isCritical) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+          <span>{data.risk_score} Risk</span>
+        </span>
+      );
+    }
+    if (isHigh) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+          <span>{data.risk_score} Risk</span>
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+        <span>{data.risk_score} Risk</span>
+      </span>
+    );
+  };
 
   return (
-    <div
-      className={`px-4 py-3 rounded-lg border bg-soc-card shadow-lg min-w-[240px] max-w-[280px] transition-all hover:border-cyan-400 ${
-        isCritical
-          ? "border-rose-500/60 shadow-rose-950/40"
-          : isHigh
-          ? "border-amber-500/60 shadow-amber-950/40"
-          : "border-soc-borderLight"
-      }`}
-    >
-      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 bg-cyan-400 border border-slate-900" />
+    <div className="w-[290px] bg-white border border-gray-200 rounded-2xl p-4 shadow-xs hover:border-brand-500 transition-all">
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-2.5 h-2.5 !bg-brand-600 !border-2 !border-white rounded-full"
+      />
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-800">
-        <div className="flex items-center space-x-1.5">
-          <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-            Step {data.step_number}
-          </span>
-          <span className="text-xs font-mono font-semibold text-rose-400">
-            {data.technique_id}
-          </span>
+      {/* Header with step number & severity pill */}
+      <div className="flex items-center justify-between pb-2.5 border-b border-gray-100">
+        <span className="text-xs font-mono font-medium text-gray-500">
+          Step {data.step_number}
+        </span>
+        {getSeverityBadge()}
+      </div>
+
+      {/* Technique title */}
+      <div className="mt-2.5">
+        <div className="text-xs font-mono font-bold text-brand-600">
+          {data.technique_id}
         </div>
         <div
-          className={`text-[11px] font-mono px-2 py-0.5 rounded font-bold ${
-            isCritical
-              ? "bg-rose-500/20 text-rose-400 border border-rose-500/40"
-              : "bg-amber-500/20 text-amber-400 border border-amber-500/40"
-          }`}
+          className="text-sm font-bold text-gray-900 leading-snug mt-0.5 line-clamp-1"
+          title={data.technique_name}
         >
-          {data.risk_score} RISK
+          {data.technique_name}
         </div>
       </div>
 
-      {/* Technique Title */}
-      <div className="font-semibold text-xs text-slate-100 mb-2 truncate" title={data.technique_name}>
-        {data.technique_name}
+      {/* Target metadata */}
+      <div className="mt-3 pt-2.5 border-t border-gray-100 space-y-1.5 text-xs text-gray-600 font-mono">
+        <div className="flex items-center space-x-2 truncate">
+          <Server className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
+            Host: <strong className="text-gray-900 font-medium">{data.host || "N/A"}</strong>
+          </span>
+        </div>
+        <div className="flex items-center space-x-2 truncate">
+          <User className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
+            User: <strong className="text-gray-900 font-medium">{data.user || "N/A"}</strong>
+          </span>
+        </div>
+        <div className="flex items-center space-x-2 truncate">
+          <Globe className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
+            IP: <strong className="text-gray-900 font-medium">{data.ip || "N/A"}</strong>
+          </span>
+        </div>
       </div>
 
-      {/* Target Metadata */}
-      <div className="space-y-1 text-[11px] font-mono text-slate-400">
-        <div className="flex items-center space-x-1.5 truncate">
-          <Server className="w-3 h-3 text-cyan-400 flex-shrink-0" />
-          <span className="truncate">{data.host || "N/A"}</span>
-        </div>
-        <div className="flex items-center space-x-1.5 truncate">
-          <User className="w-3 h-3 text-purple-400 flex-shrink-0" />
-          <span className="truncate">{data.user || "N/A"}</span>
-        </div>
-        <div className="flex items-center space-x-1.5 truncate">
-          <Network className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-          <span className="truncate">{data.ip || "N/A"}</span>
-        </div>
-      </div>
-
-      <Handle type="source" position={Position.Right} className="w-2.5 h-2.5 bg-cyan-400 border border-slate-900" />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-2.5 h-2.5 !bg-brand-600 !border-2 !border-white rounded-full"
+      />
     </div>
   );
 });

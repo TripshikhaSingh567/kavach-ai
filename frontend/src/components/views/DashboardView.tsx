@@ -1,7 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { Play, Pause, RotateCcw, FastForward, ShieldAlert, Activity, CheckCircle2, AlertTriangle, Eye, Layers, ArrowRight, Zap } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  FastForward,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  Server,
+  User,
+  Globe,
+  Radio,
+  Sliders,
+  Activity,
+  ShieldAlert,
+  AlertTriangle,
+  Filter
+} from "lucide-react";
 
 interface DashboardViewProps {
   scenarioId: string;
@@ -9,7 +26,6 @@ interface DashboardViewProps {
   rawEvents: any[];
   detectedEvents: any[];
   onCorrelate: () => void;
-  onSelectEventForInspector?: (event: any) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -20,16 +36,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onCorrelate,
 }) => {
   const [isPlaying, setIsPlaying] = useState(true);
-  const [streamIndex, setStreamIndex] = useState(4); // Start with initial batch visible
+  const [streamIndex, setStreamIndex] = useState(4);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
-  // Auto-play timer
+  // Auto-play interval
   useEffect(() => {
     if (!isPlaying) return;
     if (streamIndex >= detectedEvents.length) return;
 
-    const intervalMs = Math.max(500, Math.floor(2500 / playbackSpeed));
+    const intervalMs = Math.max(500, Math.floor(2200 / playbackSpeed));
     const timer = setInterval(() => {
       setStreamIndex((prev) => {
         if (prev < detectedEvents.length) {
@@ -58,402 +74,398 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     setIsPlaying(true);
   };
 
-  const handleInstantAll = () => {
+  const handleLoadAll = () => {
     setStreamIndex(detectedEvents.length);
     setIsPlaying(false);
   };
 
+  const toggleExpand = (id: string) => {
+    setExpandedEventId(expandedEventId === id ? null : id);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Top Banner: Scenario Selector & Replay Controls */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Scenario Switcher Card */}
-        <div className="lg:col-span-6 p-4 rounded-xl border border-soc-border bg-soc-card shadow-lg">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-mono uppercase text-slate-400 font-bold flex items-center space-x-1.5">
-              <Zap className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Attack Scenario Emulation</span>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Live Feed</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Streaming endpoint and network telemetry with three-score threat evaluation.
+          </p>
+        </div>
+
+        <button
+          onClick={onCorrelate}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-all shadow-xs self-start sm:self-auto"
+        >
+          <span>Correlate incident</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Scenario Selector: Clean Rows / Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div
+          onClick={() => {
+            setScenarioId("scenario_a");
+            handleReset();
+          }}
+          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+            scenarioId === "scenario_a"
+              ? "bg-white border-brand-600 shadow-xs ring-2 ring-brand-100"
+              : "bg-white border-gray-200 hover:border-gray-300 shadow-xs"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold text-gray-900">
+              Scenario A: Phishing credential compromise
             </span>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-              Seeded Randomness (Reproducible)
-            </span>
+            {scenarioId === "scenario_a" && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-600" />
+                <span>Active</span>
+              </span>
+            )}
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => {
-                setScenarioId("scenario_a");
-                handleReset();
-              }}
-              className={`p-3 rounded-lg border text-left transition-all ${
-                scenarioId === "scenario_a"
-                  ? "border-cyan-500/80 bg-cyan-950/30 shadow-md shadow-cyan-950/50"
-                  : "border-slate-800 bg-slate-900/50 hover:border-slate-700"
-              }`}
-            >
-              <div className="text-xs font-bold text-white mb-1">Scenario A: Phishing Compromise</div>
-              <p className="text-[11px] text-slate-400 line-clamp-2">
-                Spearphishing link, impossible travel Bucharest login, Exchange forwarding rule, financial exfiltration.
-              </p>
-              <div className="mt-2 text-[10px] font-mono text-cyan-400">T1566 &bull; T1078 &bull; T1114 &bull; T1020</div>
-            </button>
-
-            <button
-              onClick={() => {
-                setScenarioId("scenario_b");
-                handleReset();
-              }}
-              className={`p-3 rounded-lg border text-left transition-all ${
-                scenarioId === "scenario_b"
-                  ? "border-cyan-500/80 bg-cyan-950/30 shadow-md shadow-cyan-950/50"
-                  : "border-slate-800 bg-slate-900/50 hover:border-slate-700"
-              }`}
-            >
-              <div className="text-xs font-bold text-white mb-1">Scenario B: Lateral Movement</div>
-              <p className="text-[11px] text-slate-400 line-clamp-2">
-                Subnet port scan, PsExec remote execution, svc_deploy reuse across tier-1 hosts, LSASS memory injection.
-              </p>
-              <div className="mt-2 text-[10px] font-mono text-cyan-400">T1046 &bull; T1021 &bull; T1078 &bull; T1068</div>
-            </button>
+          <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+            Spearphishing email click, impossible travel authentication from Romania, mailbox forwarding rule, and sensitive data access over SMB.
+          </p>
+          <div className="mt-3 text-xs font-mono text-gray-500 flex items-center gap-1.5">
+            <span className="font-semibold text-gray-700">MITRE:</span> T1566 &bull; T1078 &bull; T1114 &bull; T1020
           </div>
         </div>
 
-        {/* Playback Controls & Streaming Progress */}
-        <div className="lg:col-span-6 p-4 rounded-xl border border-soc-border bg-soc-card shadow-lg flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-mono uppercase text-slate-400 font-bold flex items-center space-x-1.5">
-                <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Stream Replay Controller</span>
+        <div
+          onClick={() => {
+            setScenarioId("scenario_b");
+            handleReset();
+          }}
+          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+            scenarioId === "scenario_b"
+              ? "bg-white border-brand-600 shadow-xs ring-2 ring-brand-100"
+              : "bg-white border-gray-200 hover:border-gray-300 shadow-xs"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold text-gray-900">
+              Scenario B: Lateral movement
+            </span>
+            {scenarioId === "scenario_b" && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-600" />
+                <span>Active</span>
               </span>
-              <span className="text-xs font-mono text-cyan-300">
-                {visibleEvents.length} / {detectedEvents.length} Events Streamed
-              </span>
-            </div>
-
-            {/* Progress bar */}
-            <div className="w-full bg-slate-900 rounded-full h-2 mb-4 overflow-hidden border border-slate-800">
-              <div
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${(visibleEvents.length / Math.max(1, detectedEvents.length)) * 100}%`,
-                }}
-              />
-            </div>
+            )}
           </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition-colors shadow-md shadow-cyan-500/20"
-              >
-                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                <span>{isPlaying ? "Pause Stream" : "Play Stream"}</span>
-              </button>
-
-              <button
-                onClick={handleReset}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs border border-slate-700 transition-colors"
-                title="Reset stream to beginning"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset</span>
-              </button>
-
-              <button
-                onClick={handleInstantAll}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs border border-slate-700 transition-colors"
-                title="Stream all events immediately"
-              >
-                <FastForward className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Load All</span>
-              </button>
-            </div>
-
-            {/* Speed pills */}
-            <div className="flex items-center space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-mono">
-              <span className="text-[10px] text-slate-500 px-1">Speed:</span>
-              {[1, 2, 5].map((speed) => (
-                <button
-                  key={speed}
-                  onClick={() => setPlaybackSpeed(speed)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                    playbackSpeed === speed
-                      ? "bg-cyan-500 text-slate-950"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  {speed}x
-                </button>
-              ))}
-            </div>
+          <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+            Internal subnet port scan, remote service execution via PsExec, service credential reuse across hosts, and LSASS memory access.
+          </p>
+          <div className="mt-3 text-xs font-mono text-gray-500 flex items-center gap-1.5">
+            <span className="font-semibold text-gray-700">MITRE:</span> T1046 &bull; T1021 &bull; T1078 &bull; T1068
           </div>
         </div>
       </div>
 
-      {/* SOC Telemetry Counters */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-soc-border bg-soc-card">
-          <div className="text-xs font-mono text-slate-400 uppercase">Ingested Telemetry</div>
-          <div className="text-2xl font-black text-white mt-1 font-mono">{stats.total}</div>
-          <div className="text-[11px] text-slate-500 mt-1">Live buffer entries</div>
-        </div>
-
-        <div className="p-4 rounded-xl border border-rose-900/40 bg-rose-950/10">
-          <div className="text-xs font-mono text-rose-400 uppercase">Critical Threat Alerts</div>
-          <div className="text-2xl font-black text-rose-400 mt-1 font-mono">{stats.critical}</div>
-          <div className="text-[11px] text-rose-300/70 mt-1">Composite Risk &ge; 75</div>
-        </div>
-
-        <div className="p-4 rounded-xl border border-amber-900/40 bg-amber-950/10">
-          <div className="text-xs font-mono text-amber-400 uppercase">Suspicious / High Risk</div>
-          <div className="text-2xl font-black text-amber-400 mt-1 font-mono">{stats.high}</div>
-          <div className="text-[11px] text-amber-300/70 mt-1">Risk between 55 - 74</div>
-        </div>
-
-        <div className="p-4 rounded-xl border border-soc-border bg-soc-card">
-          <div className="text-xs font-mono text-slate-400 uppercase">Noise &amp; Benign Filtered</div>
-          <div className="text-2xl font-black text-cyan-400 mt-1 font-mono">{stats.noise}</div>
-          <div className="text-[11px] text-slate-500 mt-1">Scanner, dups, healthchecks</div>
-        </div>
-      </div>
-
-      {/* Main Alert Feed & 3-Way Detection Scoring Table */}
-      <div className="rounded-xl border border-soc-border bg-soc-card shadow-lg overflow-hidden">
-        <div className="p-4 border-b border-soc-border flex flex-wrap items-center justify-between gap-3 bg-slate-900/40">
-          <div>
-            <h2 className="text-sm font-bold text-white flex items-center space-x-2">
-              <ShieldAlert className="w-4 h-4 text-cyan-400" />
-              <span>Real-Time Ingestion &amp; 3-Score Threat Engine</span>
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Isolation Forest Anomaly (35%) + HistGB Classifier (35%) + Sigma Rule Match (30%)
-            </p>
-          </div>
+      {/* Toolbar: Replay Controls */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition-colors shadow-xs"
+          >
+            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            <span>{isPlaying ? "Pause" : "Play"}</span>
+          </button>
 
           <button
-            onClick={onCorrelate}
-            className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-xs hover:from-cyan-400 hover:to-blue-500 shadow-md shadow-cyan-500/20 transition-all"
+            onClick={handleReset}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-medium transition-colors shadow-xs"
           >
-            <span>Correlate Alerts with NetworkX</span>
-            <ArrowRight className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5 text-gray-500" />
+            <span>Reset</span>
+          </button>
+
+          <button
+            onClick={handleLoadAll}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-medium transition-colors shadow-xs"
+          >
+            <FastForward className="w-3.5 h-3.5 text-gray-500" />
+            <span>Load all</span>
           </button>
         </div>
 
+        {/* Speed Controls & Count */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1.5 text-xs">
+            <span className="text-gray-500 mr-1 font-medium">Speed:</span>
+            {[1, 2, 5].map((speed) => (
+              <button
+                key={speed}
+                onClick={() => setPlaybackSpeed(speed)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                  playbackSpeed === speed
+                    ? "bg-brand-600 text-white shadow-xs"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {speed}x
+              </button>
+            ))}
+          </div>
+
+          <span className="text-xs text-gray-500">
+            Showing <strong className="text-gray-900 font-semibold">{visibleEvents.length}</strong> of {detectedEvents.length} events
+          </span>
+        </div>
+      </div>
+
+      {/* 4 Stat Cards matching SecurePay Metric Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              INGESTED EVENTS
+            </div>
+            <Activity className="w-4 h-4 text-gray-400" />
+          </div>
+          <div className="text-3xl font-bold text-gray-900 tracking-tight mt-2">{stats.total}</div>
+          <div className="text-xs text-gray-500 mt-1">Stream buffer telemetry</div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-rose-600 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+              <span>CRITICAL ALERTS</span>
+            </div>
+            <ShieldAlert className="w-4 h-4 text-rose-500" />
+          </div>
+          <div className="text-3xl font-bold text-rose-600 tracking-tight mt-2">{stats.critical}</div>
+          <div className="text-xs text-gray-500 mt-1">Risk score &ge; 75</div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-orange-600 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              <span>HIGH-RISK ALERTS</span>
+            </div>
+            <AlertTriangle className="w-4 h-4 text-orange-500" />
+          </div>
+          <div className="text-3xl font-bold text-orange-600 tracking-tight mt-2">{stats.high}</div>
+          <div className="text-xs text-gray-500 mt-1">Risk score 55–74</div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>FILTERED NOISE</span>
+            </div>
+            <Filter className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div className="text-3xl font-bold text-gray-900 tracking-tight mt-2">{stats.noise}</div>
+          <div className="text-xs text-gray-500 mt-1">Benign and duplicates</div>
+        </div>
+      </div>
+
+      {/* Event Table with Expandable Row Breakdown */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Recent security events</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Click any row to inspect the three-score detection breakdown.</p>
+          </div>
+          <span className="text-xs text-gray-500 font-medium">
+            {visibleEvents.length} events recorded
+          </span>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-800">
+          <table className="w-full text-left text-sm table-fixed">
+            <thead className="bg-gray-50/75 text-gray-500 font-semibold text-[11px] uppercase tracking-wider border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3">Event ID</th>
-                <th className="px-4 py-3">Timestamp</th>
-                <th className="px-4 py-3">Alert Title &amp; Description</th>
-                <th className="px-4 py-3">Entities</th>
-                <th className="px-4 py-3">MITRE ATT&amp;CK</th>
-                <th className="px-4 py-3 text-center">3-Score Risk Breakdown</th>
-                <th className="px-4 py-3 text-right">Composite Risk</th>
+                <th className="py-3.5 px-6 w-28">Time</th>
+                <th className="py-3.5 px-6 w-5/12">Event</th>
+                <th className="py-3.5 px-6 w-44">Host / User</th>
+                <th className="py-3.5 px-6 w-44">Technique</th>
+                <th className="py-3.5 px-6 text-right w-36">Risk score</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
+            <tbody className="divide-y divide-gray-100">
               {visibleEvents.map((evt) => {
                 const isCrit = evt.risk_score >= 75;
                 const isHi = evt.risk_score >= 55 && evt.risk_score < 75;
-                const isMed = evt.risk_score >= 35 && evt.risk_score < 55;
-                const isDup = evt.is_duplicate;
-                const isFP = evt.is_false_positive;
-                const isInj = evt.is_prompt_injection;
-                const isMiss = evt.is_missing_logs;
+                const isExpanded = expandedEventId === evt.id;
 
                 return (
-                  <tr
-                    key={evt.id}
-                    onClick={() => setSelectedEvent(evt)}
-                    className="hover:bg-slate-800/40 transition-colors cursor-pointer"
-                  >
-                    {/* Event ID */}
-                    <td className="px-4 py-3 font-mono font-medium text-slate-300 whitespace-nowrap">
-                      <div className="flex items-center space-x-1.5">
-                        <span className={isCrit ? "text-rose-400" : isHi ? "text-amber-400" : "text-cyan-400"}>
-                          &bull;
-                        </span>
-                        <span>{evt.id}</span>
-                      </div>
-                    </td>
+                  <React.Fragment key={evt.id}>
+                    <tr
+                      onClick={() => toggleExpand(evt.id)}
+                      className={`cursor-pointer transition-colors ${
+                        isExpanded ? "bg-brand-50/40" : "hover:bg-gray-50/70"
+                      }`}
+                    >
+                      {/* Time */}
+                      <td className="py-3.5 px-6 text-xs font-mono text-gray-500 whitespace-nowrap">
+                        {new Date(evt.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        })}
+                      </td>
 
-                    {/* Timestamp */}
-                    <td className="px-4 py-3 font-mono text-slate-400 whitespace-nowrap">
-                      {new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                    </td>
-
-                    {/* Title & Desc */}
-                    <td className="px-4 py-3 max-w-sm">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-slate-200">{evt.title}</span>
-                        {isDup && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
-                            Duplicate
-                          </span>
-                        )}
-                        {isFP && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">
-                            Scanner FP
-                          </span>
-                        )}
-                        {isInj && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">
-                            Injection Defended
-                          </span>
-                        )}
-                        {isMiss && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
-                            Missing Logs
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5" title={evt.description}>
-                        {evt.description}
-                      </p>
-                    </td>
-
-                    {/* Entities */}
-                    <td className="px-4 py-3 font-mono text-[11px] text-slate-300 whitespace-nowrap">
-                      <div>Host: <span className="text-cyan-300">{evt.host || "None"}</span></div>
-                      <div>User: <span className="text-purple-300">{evt.user || "None"}</span></div>
-                      <div>IP: <span className="text-emerald-300">{evt.source_ip || "None"}</span></div>
-                    </td>
-
-                    {/* MITRE ATT&CK */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {evt.mitre_technique_id ? (
-                        <div className="inline-flex flex-col">
-                          <span className="font-mono text-xs font-bold text-rose-400">
-                            {evt.mitre_technique_id}
-                          </span>
-                          <span className="text-[10px] text-slate-400 truncate max-w-[140px]">
-                            {evt.mitre_technique_name}
-                          </span>
+                      {/* Title & Badges */}
+                      <td className="py-3.5 px-6">
+                        <div className="flex items-center space-x-2 truncate">
+                          <span className="font-semibold text-gray-900 truncate">{evt.title}</span>
+                          {evt.is_duplicate && (
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium flex-shrink-0">
+                              Duplicate
+                            </span>
+                          )}
+                          {evt.is_false_positive && (
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium flex-shrink-0">
+                              Scanner
+                            </span>
+                          )}
+                          {evt.is_prompt_injection && (
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-medium flex-shrink-0">
+                              Injection defended
+                            </span>
+                          )}
+                          {evt.is_missing_logs && (
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium flex-shrink-0">
+                              Incomplete
+                            </span>
+                          )}
                         </div>
-                      ) : (
-                        <span className="text-slate-600 font-mono text-[11px]">Unmapped (Benign)</span>
-                      )}
-                    </td>
+                        <div className="text-xs text-gray-500 font-mono mt-1 truncate">
+                          {evt.id} &bull; {evt.description}
+                        </div>
+                      </td>
 
-                    {/* 3-Score Breakdown */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center space-x-2 text-[10px] font-mono">
-                        <div className="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-center" title="Isolation Forest (Unsupervised Anomaly)">
-                          <div className="text-slate-500">IsoForest</div>
-                          <div className="font-bold text-cyan-400">{evt.score_contributions?.isolation_forest?.score || 0}</div>
+                      {/* Host / User */}
+                      <td className="py-3.5 px-6 text-xs font-mono text-gray-600 truncate">
+                        <div className="truncate">
+                          Host: <span className="text-gray-900 font-medium">{evt.host || "N/A"}</span>
                         </div>
-                        <div className="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-center" title="HistGradientBoosting (Known PortScan Classifier)">
-                          <div className="text-slate-500">HistGB</div>
-                          <div className="font-bold text-blue-400">{evt.score_contributions?.classifier?.score || 0}</div>
+                        <div className="truncate mt-0.5">
+                          User: <span className="text-gray-900 font-medium">{evt.user || "N/A"}</span>
                         </div>
-                        <div className="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-center" title="Sigma Rules Engine">
-                          <div className="text-slate-500">Sigma</div>
-                          <div className="font-bold text-amber-400">{evt.score_contributions?.sigma?.score || 0}</div>
-                        </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Composite Risk */}
-                    <td className="px-4 py-3 text-right whitespace-nowrap">
-                      <span
-                        className={`inline-block font-mono font-bold text-xs px-2.5 py-1 rounded ${
-                          isCrit
-                            ? "bg-rose-500/20 text-rose-400 border border-rose-500/40 glow-rose"
-                            : isHi
-                            ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 glow-amber"
-                            : isMed
-                            ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                            : "bg-slate-800 text-slate-400 border border-slate-700"
-                        }`}
-                      >
-                        {evt.risk_score} / 100
-                      </span>
-                    </td>
-                  </tr>
+                      {/* Technique */}
+                      <td className="py-3.5 px-6 truncate">
+                        {evt.mitre_technique_id ? (
+                          <div className="truncate">
+                            <span className="text-xs font-mono font-bold text-brand-600">
+                              {evt.mitre_technique_id}
+                            </span>
+                            <div className="text-xs text-gray-500 truncate mt-0.5">
+                              {evt.mitre_technique_name}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400 font-mono">Unmapped</span>
+                        )}
+                      </td>
+
+                      {/* Single Risk Score Number */}
+                      <td className="py-3.5 px-6 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center space-x-2 justify-end w-full">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                              isCrit
+                                ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                : isHi
+                                ? "bg-orange-50 text-orange-700 border border-orange-200"
+                                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                isCrit ? "bg-rose-500" : isHi ? "bg-orange-500" : "bg-emerald-500"
+                              }`}
+                            />
+                            <span>{evt.risk_score}</span>
+                          </span>
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-gray-400" />
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Expandable 3-Score Breakdown */}
+                    {isExpanded && (
+                      <tr className="bg-gray-50/60">
+                        <td colSpan={5} className="py-4 px-6 border-b border-gray-200">
+                          <div className="space-y-3">
+                            <div className="text-xs font-bold text-gray-900">
+                              Threat score breakdown for {evt.id}
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                              <div className="p-4 bg-white rounded-xl border border-gray-200 shadow-xs">
+                                <div className="text-xs font-medium text-gray-500">Isolation Forest (anomaly)</div>
+                                <div className="text-xl font-bold text-gray-900 mt-1">
+                                  {evt.score_contributions?.isolation_forest?.score ?? 0}
+                                </div>
+                                <div className="text-[11px] text-gray-500 mt-0.5">
+                                  Weight: 35% &bull; Contribution: {evt.score_contributions?.isolation_forest?.contribution ?? 0}
+                                </div>
+                              </div>
+
+                              <div className="p-4 bg-white rounded-xl border border-gray-200 shadow-xs">
+                                <div className="text-xs font-medium text-gray-500">Gradient boosted classifier</div>
+                                <div className="text-xl font-bold text-gray-900 mt-1">
+                                  {evt.score_contributions?.classifier?.score ?? 0}
+                                </div>
+                                <div className="text-[11px] text-gray-500 mt-0.5">
+                                  Weight: 35% &bull; Contribution: {evt.score_contributions?.classifier?.contribution ?? 0}
+                                </div>
+                              </div>
+
+                              <div className="p-4 bg-white rounded-xl border border-gray-200 shadow-xs">
+                                <div className="text-xs font-medium text-gray-500">Sigma rule matches</div>
+                                <div className="text-xl font-bold text-gray-900 mt-1">
+                                  {evt.score_contributions?.sigma?.score ?? 0}
+                                </div>
+                                <div className="text-[11px] text-gray-500 mt-0.5">
+                                  Weight: 30% &bull; Contribution: {evt.score_contributions?.sigma?.contribution ?? 0}
+                                </div>
+                              </div>
+                            </div>
+
+                            {evt.score_contributions?.sigma?.matched_rules?.length > 0 && (
+                              <div className="pt-2">
+                                <div className="text-xs font-semibold text-gray-700 mb-1.5">Matched rules:</div>
+                                <div className="flex flex-wrap gap-2">
+                                  {evt.score_contributions.sigma.matched_rules.map((rule: any) => (
+                                    <span
+                                      key={rule.id}
+                                      className="text-xs px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-800 shadow-xs"
+                                    >
+                                      <strong className="text-brand-600">{rule.id}</strong>: {rule.title}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 );
               })}
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* Selected Event Detail Modal / Drawer */}
-      {selectedEvent && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-soc-card border border-soc-borderLight rounded-xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center space-x-2">
-                <ShieldAlert className="w-5 h-5 text-cyan-400" />
-                <span className="font-mono font-bold text-sm text-white">Event Telemetry Inspector: {selectedEvent.id}</span>
-              </div>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="text-slate-400 hover:text-white font-mono text-sm px-2 py-1 rounded bg-slate-800"
-              >
-                Close &times;
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <div className="text-slate-400 text-[11px] uppercase font-mono">Title</div>
-                <div className="text-white font-bold text-sm mt-0.5">{selectedEvent.title}</div>
-              </div>
-
-              <div>
-                <div className="text-slate-400 text-[11px] uppercase font-mono">Full Log Payload</div>
-                <div className="p-3 rounded bg-slate-950 font-mono text-slate-300 border border-slate-800 break-words mt-1">
-                  {selectedEvent.description}
-                </div>
-              </div>
-
-              {/* 3-Score Breakdown Detail */}
-              <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-cyan-400 font-mono font-bold">Isolation Forest</div>
-                  <div className="text-lg font-black text-white mt-1 font-mono">
-                    {selectedEvent.score_contributions?.isolation_forest?.score}
-                  </div>
-                  <div className="text-[10px] text-slate-500">Weight: 35% &bull; Contrib: {selectedEvent.score_contributions?.isolation_forest?.contribution}</div>
-                </div>
-
-                <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-blue-400 font-mono font-bold">HistGB Classifier</div>
-                  <div className="text-lg font-black text-white mt-1 font-mono">
-                    {selectedEvent.score_contributions?.classifier?.score}
-                  </div>
-                  <div className="text-[10px] text-slate-500">Weight: 35% &bull; Contrib: {selectedEvent.score_contributions?.classifier?.contribution}</div>
-                </div>
-
-                <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-amber-400 font-mono font-bold">Sigma Rules</div>
-                  <div className="text-lg font-black text-white mt-1 font-mono">
-                    {selectedEvent.score_contributions?.sigma?.score}
-                  </div>
-                  <div className="text-[10px] text-slate-500">Weight: 30% &bull; Contrib: {selectedEvent.score_contributions?.sigma?.contribution}</div>
-                </div>
-              </div>
-
-              {selectedEvent.score_contributions?.sigma?.matched_rules?.length > 0 && (
-                <div>
-                  <div className="text-slate-400 text-[11px] uppercase font-mono">Matched Sigma Signatures</div>
-                  <div className="space-y-1.5 mt-1">
-                    {selectedEvent.score_contributions.sigma.matched_rules.map((r: any) => (
-                      <div key={r.id} className="p-2 rounded bg-amber-950/20 border border-amber-900/40 text-amber-300 font-mono text-[11px] flex justify-between">
-                        <span>{r.id}: {r.title}</span>
-                        <span className="font-bold">+{r.score} pts</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

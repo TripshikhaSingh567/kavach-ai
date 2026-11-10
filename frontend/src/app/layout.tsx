@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KAVACH-AI | Autonomous Cyber-Resilience Engine",
-  description: "AI-assisted cyber-resilience tool turning fragmented security alerts into one prioritised incident with human-in-the-loop approvals.",
+  title: "KAVACH-AI | Cyber Resilience & Incident Triage",
+  description: "Internal security operations tool for alert correlation, automated anomaly scoring, and human-in-the-loop containment.",
 };
 
 export default function RootLayout({
@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-soc-bg min-h-screen text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950">
+    <html lang="en">
+      <body className="bg-[#FAF7F2] text-[#1F2933] min-h-screen antialiased">
         {children}
       </body>
     </html>

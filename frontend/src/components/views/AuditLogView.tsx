@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileText, Download, ShieldCheck, Filter, Search, CheckCircle2, UserCheck, Bot } from "lucide-react";
+import { Download, Search, CheckCircle2, ShieldAlert } from "lucide-react";
 
 interface AuditLogViewProps {
   logs: any[];
@@ -38,125 +38,125 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs }) => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="p-5 rounded-xl border border-soc-border bg-soc-card shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                Tamper-Evident Ledger
-              </span>
-              <span className="text-xs font-mono text-slate-400">SOC 2 &bull; ISO 27001 Audit Ready</span>
-            </div>
-            <h1 className="text-lg font-black text-white mt-1">Append-Only Resilience Audit Trail</h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Immutable chronological record of every ML detection, graph correlation, AI triage recommendation, human approval, and executed containment.
-            </p>
-          </div>
-
-          <button
-            onClick={handleExportJSON}
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-colors shadow-md shadow-cyan-500/20"
-          >
-            <Download className="w-4 h-4" />
-            <span>Export Audit Trail (JSON)</span>
-          </button>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Audit Trail</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Append-only audit log with SHA-256 hash chaining to ensure traceability of all automated and manual actions.
+          </p>
         </div>
+
+        <button
+          onClick={handleExportJSON}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold transition-all shadow-xs self-start sm:self-auto"
+        >
+          <Download className="w-4 h-4 text-gray-500" />
+          <span>Export JSON</span>
+        </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-xl border border-soc-border bg-soc-card flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center space-x-2 flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-slate-500" />
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center space-x-2.5 flex-1 min-w-[240px]">
+          <Search className="w-4 h-4 text-gray-400" />
           <input
             type="text"
             placeholder="Search by action, target, actor, or reason..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:outline-none w-full font-mono"
+            className="w-full text-xs text-gray-900 placeholder-gray-400 focus:outline-none bg-transparent"
           />
         </div>
 
         {/* Category Pills */}
-        <div className="flex items-center space-x-1 overflow-x-auto text-xs font-mono">
+        <div className="flex items-center space-x-1.5 overflow-x-auto text-xs">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
                 selectedCategory === cat
-                  ? "bg-cyan-500 text-slate-950"
-                  : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-brand-600 text-white shadow-xs"
+                  : "text-gray-600 hover:bg-gray-100"
               }`}
             >
-              {cat}
+              {cat === "ALL" ? "All" : cat.toLowerCase().replace("_", " ")}
             </button>
           ))}
         </div>
       </div>
 
       {/* Audit Log Table */}
-      <div className="rounded-xl border border-soc-border bg-soc-card shadow-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-800">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50/75 text-gray-500 font-semibold text-[11px] uppercase tracking-wider border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3.5">Log ID</th>
-                <th className="px-4 py-3.5">Timestamp</th>
-                <th className="px-4 py-3.5">Actor</th>
-                <th className="px-4 py-3.5">Category</th>
-                <th className="px-4 py-3.5">Action &amp; Target</th>
-                <th className="px-4 py-3.5">Operational Reason / Justification</th>
+                <th className="py-3.5 px-6">Log ID</th>
+                <th className="py-3.5 px-6">Time</th>
+                <th className="py-3.5 px-6">Actor</th>
+                <th className="py-3.5 px-6">Category</th>
+                <th className="py-3.5 px-6">Action &amp; target</th>
+                <th className="py-3.5 px-6">Reason</th>
+                <th className="py-3.5 px-6">SHA-256 hash</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 font-sans">
+            <tbody className="divide-y divide-gray-100">
               {filteredLogs.map((log) => {
                 const isAnalyst = log.actor?.includes("ANALYST");
-                const isDefense = log.category === "DEFENSE";
-                const isApproval = log.category === "APPROVAL";
 
                 return (
-                  <tr key={log.id} className="hover:bg-slate-800/40 transition-colors">
+                  <tr key={log.id} className="hover:bg-gray-50/60 transition-colors">
                     {/* Log ID */}
-                    <td className="px-4 py-3 font-mono font-bold text-cyan-300 whitespace-nowrap">
+                    <td className="py-4 px-6 font-mono text-xs font-bold text-brand-600 whitespace-nowrap">
                       {log.id}
                     </td>
 
-                    {/* Timestamp */}
-                    <td className="px-4 py-3 font-mono text-slate-400 whitespace-nowrap text-[11px]">
-                      {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    {/* Time */}
+                    <td className="py-4 px-6 font-mono text-xs text-gray-500 whitespace-nowrap">
+                      {new Date(log.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
                     </td>
 
                     {/* Actor */}
-                    <td className="px-4 py-3 font-mono whitespace-nowrap">
+                    <td className="py-4 px-6 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                           isAnalyst
-                            ? "bg-purple-950 text-purple-300 border border-purple-800"
-                            : isDefense
-                            ? "bg-rose-950 text-rose-300 border border-rose-800"
-                            : "bg-slate-900 text-slate-300 border border-slate-800"
+                            ? "bg-brand-50 text-brand-700 border border-brand-200"
+                            : "bg-gray-100 text-gray-700"
                         }`}
                       >
-                        {isAnalyst ? <UserCheck className="w-3 h-3 text-purple-400" /> : <Bot className="w-3 h-3 text-cyan-400" />}
-                        <span>{log.actor}</span>
+                        {log.actor}
                       </span>
                     </td>
 
                     {/* Category */}
-                    <td className="px-4 py-3 font-mono text-[11px] whitespace-nowrap">
-                      <span className="text-slate-400 uppercase font-bold">{log.category}</span>
+                    <td className="py-4 px-6 text-xs font-medium text-gray-600 whitespace-nowrap">
+                      {log.category?.toLowerCase().replace("_", " ")}
                     </td>
 
                     {/* Action & Target */}
-                    <td className="px-4 py-3">
-                      <div className="font-bold text-white text-xs">{log.action}</div>
-                      <div className="text-[11px] font-mono text-cyan-400 mt-0.5">Target: {log.target}</div>
+                    <td className="py-4 px-6">
+                      <div className="text-xs font-bold text-gray-900">{log.action}</div>
+                      <div className="text-xs font-mono text-gray-500 mt-0.5">Target: {log.target}</div>
                     </td>
 
                     {/* Reason */}
-                    <td className="px-4 py-3 text-slate-300 text-xs max-w-md">
+                    <td className="py-4 px-6 text-xs text-gray-600 max-w-sm leading-relaxed">
                       {log.reason}
+                    </td>
+
+                    {/* Hash */}
+                    <td
+                      className="py-4 px-6 font-mono text-[11px] text-gray-400 whitespace-nowrap"
+                      title={`Hash: ${log.hash || "N/A"}\nPrevious: ${log.previous_hash || "N/A"}`}
+                    >
+                      {log.hash ? log.hash.substring(0, 10) + "..." : "Initial"}
                     </td>
                   </tr>
                 );

@@ -87,33 +87,41 @@ def correlate_events(events: list[dict], scenario_id: str = "scenario_a") -> dic
         graph_nodes = []
         graph_edges = []
         
-        # Horizontal kill chain layout
-        base_x = 80
-        base_y = 120
-        spacing_x = 280
+        # Horizontal kill chain layout with generous spacing
+        base_x = 40
+        base_y = 100
+        spacing_x = 320
         
         for idx, evt in enumerate(comp_events):
             node_id = f"graph-node-{evt['id']}"
+            tech_id = evt.get("mitre_technique_id")
+            tech_name = evt.get("mitre_technique_name")
+
+            if evt.get("is_missing_logs") or not tech_id or "Uncorrelated" in str(tech_name):
+                tech_id = "DEGRADED"
+                tech_name = "Incomplete telemetry"
+
             graph_nodes.append({
                 "id": node_id,
                 "type": "mitreNode",
-                "position": {"x": base_x + (idx * spacing_x), "y": base_y + ((idx % 2) * 60)},
+                "position": {"x": base_x + (idx * spacing_x), "y": base_y + ((idx % 2) * 40)},
                 "data": {
                     "event_id": evt["id"],
                     "title": evt["title"],
-                    "technique_id": evt.get("mitre_technique_id", "T1000"),
-                    "technique_name": evt.get("mitre_technique_name", "Security Event"),
-                    "host": evt.get("host", "Unknown"),
-                    "user": evt.get("user", "Unknown"),
-                    "ip": evt.get("source_ip", "Unknown"),
+                    "technique_id": tech_id or "T1000",
+                    "technique_name": tech_name or "Security event",
+                    "host": evt.get("host") or "N/A",
+                    "user": evt.get("user") or "N/A",
+                    "ip": evt.get("source_ip") or "N/A",
                     "risk_score": evt.get("risk_score", 50),
                     "severity": evt.get("severity", "MEDIUM"),
                     "timestamp": evt.get("timestamp", ""),
-                    "step_number": idx + 1
+                    "step_number": idx + 1,
+                    "is_missing_logs": evt.get("is_missing_logs", False)
                 }
             })
             
-            # Causal chain edge
+            # Causal chain edge without overflowing labels
             if idx > 0:
                 prev_node_id = f"graph-node-{comp_events[idx - 1]['id']}"
                 graph_edges.append({
@@ -121,8 +129,7 @@ def correlate_events(events: list[dict], scenario_id: str = "scenario_a") -> dic
                     "source": prev_node_id,
                     "target": node_id,
                     "animated": True,
-                    "label": "Attack Progression",
-                    "style": {"stroke": "#06b6d4", "strokeWidth": 2}
+                    "style": {"stroke": "#0F766E", "strokeWidth": 2}
                 })
 
         incidents.append({
